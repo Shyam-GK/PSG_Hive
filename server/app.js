@@ -1,8 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const session = require("express-session");
-const RedisStore = require("connect-redis").default;
 require("dotenv").config();
 
 const app = express();
@@ -12,59 +10,36 @@ Object.keys(require.cache).forEach((key) => {
   delete require.cache[key];
 });
 
-// Redis Client (from ./config/redis)
-const { redisClient } = require("./config/redis");
-
-// Redis Store for Sessions
-const redisStore = new RedisStore({
-  client: redisClient,
-  prefix: "session:",
-});
-
 // Middleware
 const allowedOrigins = [
   "http://localhost:3000",
   "https://psg-hive.vercel.app",
   "https://psg-hive-shyam-gks-projects.vercel.app",
-  "https://psg-hive-git-main-shyam-gks-projects.vercel.app",
+  "https://psg-hive-git-main-shyam-gks-projects.vercel.app"
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Credentials", "Authorization"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  })
-);
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Credentials', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
+
 
 // Parse cookies
 app.use(cookieParser());
 
-// Session middleware
-app.use(
-  session({
-    store: redisStore,
-    secret: process.env.SESSION_SECRET || "your-secret-key",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // Secure in production (HTTPS required)
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Allow cross-origin in production
-      maxAge: 3600000, // 1 hour in milliseconds
-    },
-  })
-);
-
 // Parse JSON bodies
 app.use(express.json());
+
+// Redis Connection
+require("./config/redis");
 
 // Routes
 const studentRoutes = require("./routes/studentRoutes");
@@ -74,7 +49,7 @@ const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const attendanceRoutes = require("./routes/attRoutes");
 const allotmentRoutes = require("./routes/allotmentRoutes");
-const profileRoutes = require("./routes/profileRoutes");
+const profileRoutes = require('./routes/profileRoutes')
 
 app.use("/student", studentRoutes);
 app.use("/api/clubs", clubRoutes);
@@ -83,8 +58,7 @@ app.use("/api/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/allotment", allotmentRoutes);
-app.use("/api/profile", profileRoutes);
-
+app.use('/api/profile',profileRoutes)
 // Error handler middleware
 const errorHandler = require("./middleware/errorHandler");
 app.use(errorHandler);
