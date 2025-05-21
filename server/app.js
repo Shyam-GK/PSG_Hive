@@ -11,12 +11,25 @@ Object.keys(require.cache).forEach((key) => {
 });
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://psg-hive-shyam-gks-projects.vercel.app",
+  "https://psg-hive-git-main-shyam-gks-projects.vercel.app"
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow your frontend origin
-  credentials: true, // Allow cookies/credentials
-  allowedHeaders: ['Content-Type', 'Credentials', 'Authorization'], // Allow specific headers
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow necessary methods
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Credentials', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
+
 
 // Parse cookies
 app.use(cookieParser());
