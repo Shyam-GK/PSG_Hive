@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './allevents.css';
+import API_BASE_URL from "../../api"; 
+
 
 const defaultEventImage = 'https://via.placeholder.com/800x800.png?text=No+Image';
 const defaultClubLogo = 'https://images.unsplash.com/photo-1596495577886-d920f1fb7238?auto=format&fit=crop&w=800&q=80';
@@ -15,7 +17,7 @@ const AllEvents = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/events/all');
+        const response = await fetch(`${API_BASE_URL}/api/events/all`);
         if (!response.ok) {
           throw new Error(`Failed to fetch events: ${response.status}`);
         }
@@ -26,7 +28,7 @@ const AllEvents = () => {
           data.map(async (event) => {
             if (!event.club_name) {
               try {
-                const clubResponse = await fetch(`http://localhost:5000/api/events/club-name/${event.club_id}`);
+                const clubResponse = await fetch(`${API_BASE_URL}/api/events/club-name/${event.club_id}`);
                 if (clubResponse.ok) {
                   const clubData = await clubResponse.json();
                   return { ...event, club_name: clubData.club_name };

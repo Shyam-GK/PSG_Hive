@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './studentProfile.css';
+import API_BASE_URL from "./api"; 
 
 const StudentProfile = () => {
   const { studentId } = useParams();
@@ -18,8 +19,8 @@ const StudentProfile = () => {
     setLoading(true);
     setError('');
     try {
-      console.log("Fetching user details from http://localhost:5000/student/me...");
-      const response = await axios.get('http://localhost:5000/student/me', {
+      console.log(`Fetching user details from ${API_BASE_URL}/student/me...`);
+      const response = await axios.get(`${API_BASE_URL}/student/me`, {
         withCredentials: true,
       });
       console.log("User details fetched successfully:", response.data);
@@ -56,7 +57,7 @@ const StudentProfile = () => {
     setError('');
     try {
       console.log(`Fetching profile for studentId: ${id}`);
-      const response = await axios.get(`http://localhost:5000/api/profile/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/profile/${id}`, {
         withCredentials: true,
       });
       console.log("Profile fetched successfully:", response.data);

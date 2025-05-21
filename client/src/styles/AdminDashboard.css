@@ -9,7 +9,7 @@ body, html {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); /* Even lighter for better contrast */
   min-height: 100vh;
-  color: #2d3748;
+  color: #f4f4f5;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -71,6 +71,7 @@ body.dark-mode .dashboard-header {
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 0.5px;
+  color: #ffffff;
 }
 
 .header-right {

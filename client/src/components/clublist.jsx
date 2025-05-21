@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './clublist.css';
-
+import API_BASE_URL from "../api"; 
 const defaultImage = 'https://images.unsplash.com/photo-1596495577886-d920f1fb7238?auto=format&fit=crop&w=800&q=80';
 
 const ClubList = () => {
@@ -11,7 +11,7 @@ const ClubList = () => {
   const observer = useRef(null);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/clubs/all')
+    fetch(`${API_BASE_URL}/api/clubs/all`)
       .then(res => {
         console.log('Response status:', res.status);
         return res.json();

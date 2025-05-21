@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './events.css';
 import { useNavigate } from 'react-router-dom';
 import eventImage from './event.jpeg';
+import API_BASE_URL from "../api"; 
 
 function EventPage() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function EventPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/events/landing');
+        const res = await fetch(`${API_BASE_URL}/api/events/landing`);
         const data = await res.json();
         setEvents(
           data

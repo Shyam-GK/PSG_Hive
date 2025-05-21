@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/ClubRegistrationForm.css';
-
+import API_BASE_URL from "../api"; 
 const maxClubsAllowed = 3;
 
 // Set base URL to the root of the backend
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = `${API_BASE_URL}`;
 
 const ClubRegistrationForm = () => {
   const [clubs, setClubs] = useState([]);
@@ -17,7 +17,7 @@ const ClubRegistrationForm = () => {
 
   const fetchUserDetails = async () => {
     try {
-      console.log("Fetching user details from http://localhost:5000/student/me...");
+      console.log("Fetching user details from ${API_BASE_URL}/student/me...");
       const response = await axios.get('/student/me', {
         withCredentials: true,
       });
@@ -35,7 +35,7 @@ const ClubRegistrationForm = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("Attempting to fetch clubs from http://localhost:5000/student/available-clubs...");
+      console.log("Attempting to fetch clubs from ${API_BASE_URL}/student/available-clubs...");
       const response = await axios.get('/student/available-clubs', {
         timeout: 5000,
         withCredentials: true,
@@ -110,7 +110,7 @@ const ClubRegistrationForm = () => {
   const confirmSubmission = async () => {
     try {
       const preferences = applications.map((app) => app.clubId);
-      console.log("Submitting registration to http://localhost:5000/student/register-club:", { preferences });
+      console.log("Submitting registration to ${API_BASE_URL}/student/register-club:", { preferences });
       const response = await axios.post('/student/register-club', {
         preferences,
       }, {

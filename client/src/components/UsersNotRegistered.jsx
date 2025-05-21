@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/AdminDashboard.css';
+import API_BASE_URL from "../api"; 
 
 const UsersNotRegistered = () => {
   const [usersNotRegistered, setUsersNotRegistered] = useState([]);
@@ -20,7 +21,7 @@ const UsersNotRegistered = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:5000/admin/users-not-registered', { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/admin/users-not-registered`, { withCredentials: true });
       const data = response.data;
       setUsersNotRegistered(data);
       setFilteredData(data);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/AdminDashboard.css';
-
+import API_BASE_URL from "../api"; 
 const ClubSummary = () => {
   const [clubSummary, setClubSummary] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -25,7 +25,7 @@ const ClubSummary = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:5000/admin/club-summary', { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/admin/club-summary`, { withCredentials: true });
       const data = response.data;
       setClubSummary(data);
       setFilteredData(data);

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './LoginForm.css';
 import girlImg from './girl.jpg';
+import API_BASE_URL from "../../api"; 
+
 
 const LoginForm = () => {
   const [username, setUsername] = useState(''); // actually email
@@ -14,7 +16,7 @@ const LoginForm = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         username: username,
         password: password,
       }, { withCredentials: true }); // Important for receiving cookies

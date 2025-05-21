@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import "../styles/StudentDashboard.css";
+import API_BASE_URL from "../api"; 
 
 const StudentDashboard = () => {
   const [clubs, setClubs] = useState([]);
@@ -20,7 +21,7 @@ const StudentDashboard = () => {
 
   const fetchClubs = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/student/club-list", { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/student/club-list`, { withCredentials: true });
       setClubs(response.data);
     } catch (err) {
       console.error("Error fetching clubs:", err.response?.data || err.message);
@@ -30,7 +31,7 @@ const StudentDashboard = () => {
 
   const fetchPreferences = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/student/preferences", { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/student/preferences`, { withCredentials: true });
       setPreferences(response.data);
     } catch (err) {
       console.error("Error fetching preferences:", err.response?.data || err.message);
@@ -40,7 +41,7 @@ const StudentDashboard = () => {
 
   const fetchAllotment = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/student/allotment", { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/student/allotment`, { withCredentials: true });
       setAllotment(response.data);
     } catch (err) {
       console.error("Error fetching allotment:", err.response?.data || err.message);
@@ -50,7 +51,7 @@ const StudentDashboard = () => {
 
   const fetchRegistrationStatus = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/student/registration-status", { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/student/registration-status`, { withCredentials: true });
       setRegistrationStatus(response.data);
     } catch (err) {
       console.error("Error fetching registration status:", err.response?.data || err.message);

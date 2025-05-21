@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Otp.css';
+import API_BASE_URL from "../../api"; 
+
 
 const Otp = () => {
   const [otp, setOtp] = useState('');
@@ -36,7 +38,7 @@ const Otp = () => {
 
     try {
       // Call backend to verify OTP
-      const res = await axios.post('http://localhost:5000/api/auth/verify-otp', {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, {
         email,
         otp,
       });
@@ -58,7 +60,7 @@ const Otp = () => {
 
   const handleResend = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+      await axios.post(`${API_BASE_URL}/api/auth/forgot-password`, { email });
       setCountdown(60);
       setResendVisible(false);
       setMessage('🔁 OTP resent successfully.');

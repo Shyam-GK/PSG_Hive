@@ -5,6 +5,7 @@ import "./LandingPage.css";
 import ClubList from "../components/clublist";
 import EventCard from "../components/events";
 import ScrollingBanner from "../components/scroll";
+import API_BASE_URL from "../api"; 
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -32,8 +33,8 @@ export default function LandingPage() {
   // Fetch user details
   const fetchUserDetails = async () => {
     try {
-      console.log("Fetching user details from http://localhost:5000/student/me...");
-      const response = await axios.get('http://localhost:5000/student/me', {
+      console.log(`Fetching user details from ${API_BASE_URL}/student/me...`);
+      const response = await axios.get(`${API_BASE_URL}/student/me`, {
         withCredentials: true, // Include cookies for authentication
       });
       console.log("User details fetched successfully:", response.data);

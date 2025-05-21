@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/AdminDashboard.css';
+import API_BASE_URL from "../api"; 
 
 const UsersAllotments = () => {
   const [usersAllotments, setUsersAllotments] = useState([]);
@@ -26,7 +27,7 @@ const UsersAllotments = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:5000/admin/users-allotments', { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/admin/users-allotments`, { withCredentials: true });
       const data = response.data;
       setUsersAllotments(data);
       setFilteredData(data);

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';  // new import
 import './LoginForm.css';
 import girlImg from './girl.jpg';
+import API_BASE_URL from "../../api"; 
+
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -12,7 +14,7 @@ const ForgotPassword = () => {
 
   const handleReset = async () => {
   try {
-    const res = await axios.post('http://localhost:5000/api/auth/forgot-password', {
+    const res = await axios.post(`${API_BASE_URL}/api/auth/forgot-password`, {
       email: email,
     });
 

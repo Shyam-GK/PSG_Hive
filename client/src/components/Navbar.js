@@ -5,6 +5,7 @@ import logo from '../pages/auth/psgtech.png';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../index.css';
+import API_BASE_URL from "../api"; 
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+      const response = await axios.post(`${API_BASE_URL}/api/auth/logout`, {}, { withCredentials: true });
 
       if (response.data.success) {
         localStorage.removeItem('isLoggedIn');

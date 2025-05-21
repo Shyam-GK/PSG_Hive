@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import './clubdetails.css';
+import API_BASE_URL from "../../api"; 
+
 
 const ClubDetail = () => {
   const { club_id } = useParams();
@@ -11,7 +13,7 @@ const ClubDetail = () => {
 
   const fetchClub = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/clubs/${club_id}`);
+      const response = await fetch(`${API_BASE_URL}/api/clubs/${club_id}`);
       if (!response.ok) throw new Error('Club not found');
       const data = await response.json();
       if (!data.image) {

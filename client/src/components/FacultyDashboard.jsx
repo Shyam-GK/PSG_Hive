@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/FacultyDashboard.css';
+import API_BASE_URL from "../api"; 
 
 const FacultyDashboard = () => {
   const [club, setClub] = useState(null);
@@ -28,7 +29,7 @@ const FacultyDashboard = () => {
   const fetchFacultyClub = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/auth/faculty-club', {
+      const response = await axios.get(`${API_BASE_URL}/api/auth/faculty-club`, {
         withCredentials: true,
       });
       if (response.data.hasClub) {
@@ -59,7 +60,7 @@ const FacultyDashboard = () => {
     setLoading(true);
     try {
       console.log('Fetching events for club:', clubIdToFetch);
-      const response = await fetch(`http://localhost:5000/api/events/club/${clubIdToFetch}`);
+      const response = await fetch(`${API_BASE_URL}/api/events/club/${clubIdToFetch}`);
       if (!response.ok) {
         const text = await response.text();
         throw new Error(`HTTP error ${response.status}: ${text}`);
@@ -84,7 +85,7 @@ const FacultyDashboard = () => {
     setLoading(true);
     try {
       console.log('Fetching students for club:', clubIdToFetch);
-      const response = await fetch(`http://localhost:5000/api/allotment/club/${clubIdToFetch}`);
+      const response = await fetch(`${API_BASE_URL}/api/allotment/club/${clubIdToFetch}`);
       if (!response.ok) {
         const text = await response.text();
         console.error('Fetch students error response:', text);
@@ -121,7 +122,7 @@ const FacultyDashboard = () => {
     setLoading(true);
     try {
       console.log('Fetching attendance for event:', eventId, 'club:', clubId);
-      const response = await fetch(`http://localhost:5000/api/attendance/event/${eventId}?clubId=${clubId}`);
+      const response = await fetch(`${API_BASE_URL}/api/attendance/event/${eventId}?clubId=${clubId}`);
       if (!response.ok) {
         const text = await response.text();
         throw new Error(`HTTP error ${response.status}: ${text}`);
@@ -158,7 +159,7 @@ const FacultyDashboard = () => {
     setLoading(true);
     try {
       console.log('Fetching attendance for student:', studentId, 'club:', club.club_id);
-      const response = await fetch(`http://localhost:5000/api/attendance/user/${studentId}?clubId=${club.club_id}`);
+      const response = await fetch(`${API_BASE_URL}/api/attendance/user/${studentId}?clubId=${club.club_id}`);
       if (!response.ok) {
         const text = await response.text();
         throw new Error(`HTTP error ${response.status}: ${text}`);
@@ -195,7 +196,7 @@ const FacultyDashboard = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('http://localhost:5000/api/events/add', {
+      const response = await fetch(`${API_BASE_URL}/api/events/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -250,7 +251,7 @@ const FacultyDashboard = () => {
           attendance: attendance[student.student_id] ? 'Present' : 'Absent',
         };
         console.log('Sending attendance payload for', student.student_id, ':', payload);
-        const response = await fetch('http://localhost:5000/api/attendance/mark', {
+        const response = await fetch(`${API_BASE_URL}/api/attendance/mark`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

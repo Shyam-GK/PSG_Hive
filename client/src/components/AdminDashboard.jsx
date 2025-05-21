@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Papa from "papaparse";
 import "../styles/AdminDashboard.css";
+import API_BASE_URL from "../api"; 
 
 const AdminDashboard = () => {
   const [clubStatus, setClubStatus] = useState([]);
@@ -28,7 +29,7 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/admin/users", { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/admin/users`, { withCredentials: true });
       console.log("Fetched users for dropdown:", response.data);
       setUsers(response.data);
     } catch (err) {
@@ -41,7 +42,7 @@ const AdminDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://localhost:5000/admin/club-status", { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/admin/club-status`, { withCredentials: true });
       setClubStatus(response.data);
       setLoading(false);
     } catch (err) {
@@ -53,7 +54,7 @@ const AdminDashboard = () => {
 
   const fetchPassoutYears = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/admin/passout-years", { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/admin/passout-years`, { withCredentials: true });
       setPassoutYears(response.data);
     } catch (err) {
       console.error("Error fetching passout years:", err.response?.data || err.message);
@@ -80,7 +81,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/admin/update-vacancy/${clubId}`,
+        `${API_BASE_URL}/admin/update-vacancy/${clubId}`,
         { max_vacancy: parseInt(maxVacancy) },
         { withCredentials: true }
       );
@@ -113,7 +114,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/admin/update-advisor-poc/${clubId}`,
+        `${API_BASE_URL}/admin/update-advisor-poc/${clubId}`,
         { faculty_advisor, poc, poc_phone },
         { withCredentials: true }
       );
@@ -139,7 +140,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/admin/add-faculty",
+        `${API_BASE_URL}/admin/add-faculty`,
         {
           user_id,
           name,
@@ -191,7 +192,7 @@ const AdminDashboard = () => {
 
         try {
           const response = await axios.post(
-            "http://localhost:5000/admin/upload-users",
+            `${API_BASE_URL}/admin/upload-users`,
             parsedData,
             { withCredentials: true }
           );
@@ -216,7 +217,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/admin/update-registration",
+        `${API_BASE_URL}/admin/update-registration`,
         { passout_year: parseInt(selectedPassoutYear), is_open: isOpen },
         { withCredentials: true }
       );
