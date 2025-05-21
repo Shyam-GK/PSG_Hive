@@ -10,6 +10,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
+  "https://psg-hive.vercel.app",
   "https://psg-hive-shyam-gks-projects.vercel.app",
   "https://psg-hive-git-main-shyam-gks-projects.vercel.app"
 ];
