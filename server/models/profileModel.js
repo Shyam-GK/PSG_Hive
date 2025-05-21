@@ -1,12 +1,13 @@
 const { Pool } = require('pg');
+const pool = require('../config/db');
 
-const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "club_registration",
-  password: "shyam",
-  port: 5432,
-});
+// const pool = new Pool({
+//   user: "postgres",
+//   host: "localhost",
+//   database: "club_registration",
+//   password: "shyam",
+//   port: 5432,
+// });
 
 console.log("Pool object:", pool);
 console.log("Postgres pool object in model:", typeof pool?.query);
