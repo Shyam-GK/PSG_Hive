@@ -82,8 +82,8 @@ const login = async (req, res) => {
 
     res.cookie('jwt', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: 'None',
       maxAge: 3600 * 1000,
       path: '/',
     });
@@ -112,8 +112,8 @@ const login = async (req, res) => {
             club_name: club.club_name
           }), {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Lax',
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'None',
             maxAge: 3600 * 1000,
             path: '/',
           });
@@ -122,8 +122,8 @@ const login = async (req, res) => {
           console.log(`No club found for faculty member: ${facultyId}`);
           res.cookie('faculty_club', JSON.stringify({ hasClub: false }), {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Lax',
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'None',
             maxAge: 3600 * 1000,
             path: '/',
           });
