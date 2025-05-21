@@ -1,0 +1,517 @@
+/* Reset and Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+/* Container */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  opacity: 1 !important; /* Ensure container is visible */
+}
+
+/* Header */
+.form-header {
+  background: linear-gradient(90deg, #357abd 0%, #0d4ad9 100%);
+  color: white;
+  padding: 20px 40px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.form-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  transform: rotate(25deg);
+  animation: glossy-move 3s infinite;
+}
+
+@keyframes glossy-move {
+  0% { transform: rotate(25deg) translateX(-100%); }
+  100% { transform: rotate(25deg) translateX(100%); }
+}
+
+.logo-text {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.form-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+/* Input Container */
+.input-container {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.student-id-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.student-id-input:focus {
+  outline: none;
+  border-color: #357abd;
+  box-shadow: 0 0 0 3px rgba(53, 122, 189, 0.2);
+}
+
+/* Applications Counter */
+.application-counter {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.application-counter span {
+  display: inline-block;
+  background: linear-gradient(145deg, #357abd, #0cabce);
+  color: white;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.application-counter span::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  transform: rotate(25deg);
+  animation: glossy-move 3s infinite;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #357abd;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+  color: #555;
+  font-size: 1.1rem;
+}
+
+/* Error Message */
+.error-message {
+  text-align: center;
+  margin: 30px 0;
+  padding: 15px;
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 1rem;
+}
+
+.retry-button {
+  background: linear-gradient(145deg, #357abd, #0d4ad9);
+  color: white;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 10px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.retry-button:hover {
+  background: linear-gradient(145deg, #0cabce, #357abd);
+  transform: scale(1.05);
+}
+
+/* No Clubs Message */
+.no-clubs-message {
+  text-align: center;
+  margin: 40px 0;
+  padding: 20px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* Club List */
+.club-list {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  opacity: 1 !important; /* Ensure section is visible */
+  min-height: 300px; /* Prevent collapse */
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #357abd;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.club-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  height: 1000px; /* Ensure grid has height */
+  opacity: 1 !important; /* Force visibility */
+}
+
+.club-card1 {
+  background: linear-gradient(145deg, #ffffff, #e8ecef);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: visible; /* Prevent clipping */
+  height: 200px; /* Ensure card has height */
+  opacity: 1 !important; /* Force visibility */
+  
+}
+
+.club-card:hover {
+  transform: translateY(-0.05px);
+  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.club-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #357abd;
+  margin-bottom: 8px;
+  opacity: 1 !important; /* Force visibility */
+  position: relative;
+  z-index: 1; /* Ensure above any pseudo-elements */
+}
+
+.seats-available {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin-bottom: 12px;
+  opacity: 1 !important; /* Force visibility */
+  position: relative;
+  z-index: 1;
+}
+
+.register-button {
+  width: 100%;
+  background: linear-gradient(145deg, #357abd, #0d4ad9);
+  color: white !important; /* Force text color */
+  padding: 10px;
+  border: 1px solid #357abd; /* Debugging border */
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.3s ease;
+  opacity: 1 !important; /* Force visibility */
+  position: relative;
+  z-index: 1;
+}
+
+.register-button:hover:not(:disabled) {
+  background: linear-gradient(145deg, #0cabce, #357abd);
+  transform: scale(1.03);
+}
+
+.register-button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+/* Summary Table */
+.summary-table-container {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: 14px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-table th {
+  background: linear-gradient(145deg, #357abd, #0d4ad9);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.summary-table td {
+  font-size: 0.95rem;
+}
+
+.primary-row {
+  background: #e0f2fe;
+  font-weight: 600;
+}
+
+.delete-button {
+  background: #ef4444;
+  color: white;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.delete-button:hover {
+  background: #dc2626;
+}
+
+/* Submit Button */
+.submit-button-container {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.submit-button {
+  background: linear-gradient(90deg, #357abd, #0cabce);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: linear-gradient(90deg, #0cabce, #357abd);
+  transform: scale(1.05);
+}
+
+.submit-button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+/* Confirmation Dialog */
+.confirmation-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  animation: fadeInDialog 0.3s ease forwards;
+}
+
+@keyframes fadeInDialog {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.dialog-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #357abd;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.dialog-list {
+  margin: 20px 0;
+  padding-left: 25px;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.confirm-button {
+  background: linear-gradient(145deg, #357abd, #0d4ad9);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.confirm-button:hover {
+  background: linear-gradient(145deg, #0cabce, #357abd);
+}
+
+.cancel-button {
+  background: #6b7280;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cancel-button:hover {
+  background: #4b5563;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px 20px;
+  }
+
+  .logo-text {
+    margin-bottom: 10px;
+  }
+
+  .form-title {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .club-card {
+    padding: 15px;
+    min-height: 120px; /* Adjust for smaller screens */
+  }
+
+  .club-name {
+    font-size: 1.2rem;
+  }
+
+  .summary-table th,
+  .summary-table td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .submit-button {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-id-input {
+    max-width: 250px;
+  }
+
+  .application-counter span {
+    padding: 8px 20px;
+    font-size: 1rem;
+  }
+
+  .club-cards {
+    grid-template-columns: 1fr;
+    min-height: 150px; /* Adjust for smaller screens */
+  }
+
+  .club-card {
+    min-height: 100px; /* Adjust for smaller screens */
+  }
+
+  .dialog-content {
+    padding: 20px;
+  }
+
+  .dialog-title {
+    font-size: 1.3rem;
+  }
+
+  .dialog-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .confirm-button,
+  .cancel-button {
+    width: 100%;
+    padding: 12px;
+  }
+}

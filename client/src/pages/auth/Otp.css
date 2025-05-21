@@ -1,0 +1,116 @@
+.otp-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #a0d1f0, #0c244d);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.otp-container {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  width: 350px;
+}
+
+.otp-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.otp-email-box {
+  background-color: #f1f5ff;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.otp-email {
+  font-weight: bold;
+  color: #3b5998;
+}
+
+.otp-input {
+  padding: 12px;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.verify-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  width: 100%;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background 0.3s ease;
+}
+
+.verify-btn:hover {
+  background-color: #0056b3;
+}
+
+.timer {
+  font-size: 14px;
+  color: #333;
+}
+
+.red-timer {
+  color: red;
+  font-weight: bold;
+}
+
+.resend-link {
+  margin-top: 10px;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.otp-message {
+  margin-top: 10px;
+  color: #d9534f;
+  font-weight: bold;
+}
+
+/* Top-right popup */
+.popup-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  z-index: 999;
+  animation: slideFade 2s ease-in-out forwards;
+}
+
+@keyframes slideFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}

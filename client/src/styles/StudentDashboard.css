@@ -1,0 +1,28 @@
+.registration-section {
+  margin: 20px 0;
+}
+
+.preferences-section,
+.allotment-section {
+  margin: 20px 0;
+}
+
+.preferences-list,
+.allotment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preference-item,
+.allotment-item {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.status-message,
+.error-message {
+  margin-bottom: 10px;
+  font-weight: bold;
+}

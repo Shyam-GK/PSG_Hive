@@ -1,0 +1,28 @@
+.scrolling-banner-container {
+  width: 100%;
+  overflow: hidden;
+  background-color: #3498db;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 500;
+  padding: 1rem 0;
+}
+
+.scrolling-banner-track {
+  display: flex;
+  white-space: nowrap;
+  animation: scroll linear infinite;
+}
+
+.scrolling-banner-track span {
+  margin-right: 2rem;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

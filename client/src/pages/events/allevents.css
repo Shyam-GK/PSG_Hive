@@ -1,0 +1,299 @@
+/* Reset and enforce dark background */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure the body background is applied with high specificity */
+html, body {
+  background: #021b55 !important; /* Dark navy background, enforced */
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #f8fafc;
+  line-height: 1.6;
+  min-height: 100vh; /* Ensure full viewport coverage */
+}
+
+/* General container */
+.ae-all-events-container {
+  width: 85%;
+  max-width: 1200px;
+  margin: 3rem auto;
+  background: transparent; /* Ensure no light background interference */
+}
+
+/* Header section */
+.ae-header-section {
+  width: 100%;
+  padding: 3rem 1rem;
+  text-align: center;
+  background: linear-gradient(180deg, #00065e 0%, #0f172a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 12px; /* Match screenshot's rounded corners */
+}
+
+.ae-header-section h1 {
+  font-size: 3.5rem;
+  color: #f1f5f9;
+  margin: 0;
+  letter-spacing: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Search bar */
+.ae-search-bar-container {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.ae-search-bar-container input {
+  width: 70%;
+  max-width: 600px;
+  padding: 1rem 1.5rem;
+  border-radius: 2rem;
+  border: none;
+  font-size: 1.1rem;
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.ae-search-bar-container input::placeholder {
+  color: #94a3b8;
+  opacity: 0.8;
+}
+
+.ae-search-bar-container input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Event list */
+.ae-event-list-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+/* Event card */
+.ae-event-card {
+  display: flex;
+  align-items: center;
+  width: 90%;
+  max-width: 900px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  transform: translateY(50px);
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+  position: relative;
+}
+
+.ae-event-card.ae-in-view {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.ae-event-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Hover overlay */
+.ae-event-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(3, 7, 61, 0.7); /* Dark blue overlay */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.ae-event-card:hover::after {
+  opacity: 1;
+}
+
+/* Event image */
+.ae-event-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 1rem 0 0 1rem;
+  display: none; /* Hide image since screenshot doesn't show it */
+}
+
+/* Event info */
+.ae-event-info {
+  flex: 1;
+  padding: 1.5rem;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.ae-event-info h3 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.ae-event-info p {
+  margin: 0.5rem 0;
+  color: #cbd5e1;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Hover details for event info */
+.ae-event-card .ae-event-info > *:not(:first-child) {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.ae-event-card:hover .ae-event-info > *:not(:first-child) {
+  max-height: 300px;
+  opacity: 1;
+}
+
+/* Additional hover details (for overlay content) */
+.ae-event-info .ae-hover-details {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  width: 80%;
+}
+
+.ae-event-card:hover .ae-hover-details {
+  opacity: 1;
+}
+
+/* Club info */
+.ae-club-info {
+  padding: 1.5rem;
+  text-align: center;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1;
+}
+
+.ae-club-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.ae-club-name {
+  color: #e2e8f0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Loading and error states */
+.ae-loading, .ae-error {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  padding: 2rem;
+}
+
+.ae-error {
+  color: #f87171; /* Softer red for error */
+}
+
+/* No results */
+.ae-no-results {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  padding: 2rem;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .ae-header-section h1 {
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+  }
+
+  .ae-all-events-container {
+    width: 95%;
+  }
+
+  .ae-search-bar-container input {
+    width: 90%;
+    font-size: 1rem;
+    padding: 0.8rem 1.2rem;
+  }
+
+  .ae-event-card {
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+  }
+
+  .ae-event-image {
+    width: 100%;
+    height: 250px;
+    border-radius: 1rem 1rem 0 0;
+    display: none; /* Still hidden on mobile */
+  }
+
+  .ae-event-info {
+    padding: 1.2rem;
+  }
+
+  .ae-event-info h3 {
+    font-size: 1.5rem;
+  }
+
+  .ae-event-info p {
+    font-size: 0.95rem;
+  }
+
+  .ae-event-info .ae-hover-details {
+    width: 90%;
+  }
+
+  .ae-club-info {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.2rem;
+  }
+
+  .ae-club-logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ae-club-name {
+    font-size: 0.9rem;
+  }
+}

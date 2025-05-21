@@ -1,0 +1,237 @@
+.clubs-container {
+  display: flex; /* Make it a flex container */
+  flex-direction: column; /* Arrange children in a column */
+  padding: 4rem 2rem;
+  background: linear-gradient(to bottom, #eef2f7, #d8e1f3);
+  min-height: 10vh;
+  text-align: center;
+  animation: containerFadeUp 0.8s ease forwards; /* Animation for the container */
+  opacity: 0; /* Start invisible for animation */
+}
+
+@keyframes containerFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.clubs-heading {
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  color: #1c2b4a;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  justify-items: center;
+}
+
+.club-card {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s ease-out;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  max-width: 320px;
+  width: 100%;
+  height: 500px;
+}
+
+.club-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+  animation: float 4s ease-in-out infinite;
+}
+
+.club-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.club-image-container {
+  height: 180px;
+  overflow: hidden;
+}
+
+.club-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.club-card:hover .club-image {
+  transform: scale(1.1);
+}
+
+.club-content {
+  padding: 1.5rem;
+}
+
+.club-name {
+  font-size: 1.5rem;
+  margin: 0.5rem 0;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.club-description {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.explore-button2 {
+  padding: 0.5rem 1.2rem;
+  background: linear-gradient(45deg, #371a68, #8f8fb4);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.explore-button2:hover {
+  background: linear-gradient(45deg, #494b4d, #845ec2);
+  box-shadow: 0 0 20px #ffffff;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+/* Default desktop/tablet grid layout */
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  justify-items: center;
+}
+@media (max-width: 600px) {
+  .clubs-container {
+    padding: 2rem 1rem; /* Reduced padding for mobile */
+  }
+
+  .clubs-heading {
+    font-size: 2rem; /* Smaller heading */
+    margin-bottom: 2rem;
+  }
+
+  .clubs-grid {
+    display: flex;
+    overflow-x: auto; /* Horizontal scroll */
+    gap: 1rem; /* Space between cards */
+    padding: 0 1rem; /* Padding for scroll edges */
+    scroll-snap-type: x mandatory; /* Snap cards into place */
+    scroll-padding: 1rem; /* Ensure snap aligns with edges */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  .club-card {
+    flex: 0 0 calc(33.33% - 0.67rem); /* ~1/3 width minus gap */
+    max-width: calc(33.33% - 0.67rem);
+    height: 280px; /* Fixed height for consistency */
+    background: rgba(255, 255, 255, 0.25); /* Slightly more opaque */
+    border-radius: 14px; /* Slightly smaller radius */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    scroll-snap-align: start; /* Snap to card start */
+    opacity: 0;
+    transform: translateY(20px); /* Smaller animation distance */
+    transition: all 0.5s ease-out; /* Faster transition */
+  }
+
+  .club-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: none; /* Disable float animation for performance */
+  }
+
+  .club-card:hover {
+    transform: scale(1.02); /* Subtle scale on tap */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .club-image-container {
+    height: 120px; /* Smaller image height for narrower cards */
+    overflow: hidden;
+  }
+
+  .club-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .club-card:hover .club-image {
+    transform: scale(1.05); /* Subtle zoom */
+  }
+
+  .club-content {
+    padding: 0.8rem; /* Reduced padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    flex: 1; /* Fill remaining space */
+  }
+
+  .club-name {
+    font-size: 1rem; /* Smaller for narrow cards */
+    margin: 0.25rem 0;
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1.2;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .club-description {
+    font-size: 0.75rem; /* Smaller for readability */
+    color: #555;
+    margin: 0.4rem 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit to 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1; /* Ensure description takes available space */
+  }
+
+  .explore-button2 {
+    padding: 0.4rem 0.8rem; /* Smaller button */
+    font-size: 0.8rem;
+    border-radius: 8px; /* Smaller radius */
+    background: linear-gradient(45deg, #371a68, #8f8fb4);
+    width: fit-content; /* Adjust to content */
+    align-self: center; /* Center button */
+  }
+
+  .explore-button2:hover {
+    background: linear-gradient(45deg, #494b4d, #845ec2);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); /* Softer glow */
+  }
+}

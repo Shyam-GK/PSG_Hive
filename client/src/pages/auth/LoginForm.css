@@ -1,0 +1,243 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #98baf6; 
+}
+
+/* Fixed top navbar */
+.navbar {
+  background-color: #4b6cb7;
+  color: white;
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 10px 20px; 
+}
+
+.navbar .logo h1 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  white-space: nowrap; /* Prevent text from wrapping inside each link */
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-links li a:hover {
+  color: #ffeb3b;
+}
+
+.navbar h1 {
+  margin: 0; 
+}
+
+/* Page wrapper */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(to right, #a0d1f0, #0c244d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0px; 
+  padding-bottom: 60px;
+}
+
+/* Login form container */
+.login-container {
+  max-width: 900px;
+  width: 90%;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.login-box {
+  display: flex;
+  width: 100%;
+}
+
+.form-section {
+  flex: 1;
+  padding: 40px;
+  background-color: #ffffff;
+}
+
+.image-section {
+  flex: 1;
+  background-color: #f6f8ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  border-radius: 0 12px 12px 0; 
+}
+
+h2 {
+  font-size: 28px;
+  color: #2c2c6c;
+  margin-bottom: 20px;
+}
+
+label {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #333;
+  font-size: 16px; /* Explicitly set to match input font size */
+}
+
+input {
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* Checkbox row styling */
+.checkbox-row {
+  margin-top: 5px; /* Consistent spacing below the password input */
+}
+
+/* Style for the checkbox label */
+.checkbox-label {
+  font-size: 16px; /* Match the font size of other labels */
+  font-weight: bold; /* Match the font-weight of other labels */
+  color: #333; /* Match the color of other labels */
+  margin-top: 0; /* Override the global label margin-top */
+  display: inline-flex; /* Treat the label as a flex container for alignment */
+  align-items: center; /* Vertically center the checkbox and text */
+}
+
+/* Style the checkbox inside the label */
+.checkbox-label input[type="checkbox"] {
+  margin-left: 12px; /* Space between label text and checkbox */
+  width: 14px; /* Match the font size of the text */
+  height: 14px; /* Match the font size of the text */
+  border: 2px solid #999; /* Darker border for better contrast */
+  transform: scale(0.75); /* Scale down to ~12px (16px * 0.75) */
+  transform-origin: center; /* Scale from the center */
+  border-radius: 4px; /* Slightly more rounded corners */
+  background-color: #f0f0f0; /* Light background when unchecked */
+  appearance: none; /* Remove default browser styling */
+  cursor: pointer;
+  position: relative; /* For custom checkmark */
+  transition: background-color 0.2s, border-color 0.2s; /* Smooth transition for hover/checked */
+}
+
+/* Hover effect for the checkbox */
+.checkbox-label input[type="checkbox"]:hover:not(:checked) {
+  border-color: #666; /* Darker border on hover */
+  background-color: #e0e0e0; /* Slightly darker background on hover */
+}
+
+/* Style the checkbox when checked */
+.checkbox-label input[type="checkbox"]:checked {
+  background-color: #375a8c; /* Darker shade of the primary color */
+  border-color: #375a8c;
+}
+
+/* Add a custom checkmark when checked */
+.checkbox-label input[type="checkbox"]:checked::after {
+  content: '\2713'; /* Unicode checkmark */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white; /* White checkmark */
+  font-size: 12px; /* Adjusted for the checkbox size */
+  font-weight: bold; /* Bolder checkmark */
+}
+
+/* Wider Login button */
+.login-btn {
+  margin-top: 25px;
+  padding: 12px;
+  width: 100%; /* full width */
+  background-color: #4b6cb7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.login-btn:hover {
+  background-color: #375a8c;
+}
+
+.error {
+  color: red;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.forgot-row {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #4b6cb7;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.link-btn:hover {
+  color: #375a8c;
+}
+
+.popup-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: white;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease forwards;
+}
+
+.popup-notification.success {
+  background-color: #28a745; /* Green */
+}
+
+.popup-notification.error {
+  background-color: #dc3545; /* Red */
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

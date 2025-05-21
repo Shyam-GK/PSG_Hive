@@ -1,0 +1,577 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.lp-homepage {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: #f7f7f7;
+  color: #111827;
+  line-height: 1.6;
+  transition: background-color 0.3s, color 0.3s;
+  scroll-behavior: smooth;
+}
+
+.lp-homepage.lp-dark-mode {
+  background-color: #111827;
+  color: #e5e7eb;
+}
+
+/* Top Bar */
+.lp-top-bar {
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+  color: #fff;
+  padding: 1.5rem;
+}
+
+.lp-top-bar-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.lp-top-bar-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.lp-top-bar-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Navbar */
+.lp-navbar {
+  background: #1f2937;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.lp-homepage.lp-dark-mode .lp-navbar {
+  background: #fff;
+}
+
+.lp-navbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  animation: lp-glossy-shine 8s ease-in-out infinite;
+}
+
+.lp-navbar.lp-scrolled {
+  background: rgba(31, 41, 55, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.lp-homepage.lp-dark-mode .lp-navbar.lp-scrolled {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.lp-nav-links {
+  display: flex;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  justify-content: space-between;
+}
+
+.lp-nav-links-center {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.lp-nav-link {
+  color: #e5e7eb;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.lp-homepage.lp-dark-mode .lp-nav-link {
+  color: #111827;
+}
+
+.lp-nav-link:hover {
+  color: #60a5fa;
+}
+
+.lp-nav-register {
+  background: #60a5fa;
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 2rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lp-nav-register:hover {
+  background-color: #93c5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.lp-profile-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.lp-profile-photo:hover {
+  transform: scale(1.1);
+}
+
+/* Hamburger Menu */
+.lp-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.lp-hamburger-line {
+  width: 25px;
+  height: 3px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.lp-homepage.lp-dark-mode .lp-hamburger-line {
+  background-color: #111827;
+}
+
+.lp-hamburger.lp-open .lp-hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.lp-hamburger.lp-open .lp-hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.lp-hamburger.lp-open .lp-hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Hero Section */
+.lp-hero {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: white;
+}
+
+.lp-hero-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.lp-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.7), rgba(59, 130, 246, 0.7));
+  z-index: 1;
+}
+
+.lp-hero-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url("./psgtech.jpeg") center/cover no-repeat;
+  background-color: #111827;
+  filter: blur(8px);
+  z-index: 0;
+  transform: scale(1.1);
+}
+
+.lp-hero-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  animation: lp-glossy-shine 15s ease-in-out infinite;
+}
+
+@keyframes lp-glossy-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.lp-hero-content {
+  color: #fff;
+  padding: 3rem;
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.lp-hero-content h2 {
+  font-size: 4.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: whitesmoke;
+  text-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);
+}
+
+.lp-hero-content p {
+  font-size: 1.6rem;
+  margin-bottom: 2.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.lp-register-btn {
+  background: #0c3d79;
+  color: #fff;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lp-register-btn:hover {
+  background-color: #4e8acf;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Clubs Section */
+.lp-clubs-section {
+  padding: 6rem 1rem;
+  background-color: #f9fafb;
+}
+
+.lp-homepage.lp-dark-mode .lp-clubs-section {
+  background-color: #1f2937;
+}
+
+.lp-clubs-content {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.lp-clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* About Hive Section */
+.about-hive-section {
+  padding: 5rem 5%;
+  text-align: center;
+  background-color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.section-heading {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+.section-description {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #666;
+}
+
+/* Events Section */
+.events-section {
+  padding: 5rem 5%;
+  background-color: #f1f1f1;
+}
+
+/* Contact Section */
+.lp-contact-section {
+  padding: 4rem 1rem;
+  background-color: #f9fafb;
+}
+
+.lp-homepage.lp-dark-mode .lp-contact-section {
+  background-color: #1f2937;
+}
+
+.lp-contact-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+.lp-profile-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #60a5fa; /* Background color for the icon */
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the SVG icon */
+  color: #fff; /* Icon color */
+}
+
+.lp-profile-photo:hover {
+  transform: scale(1.1);
+}
+
+.lp-profile-photo svg {
+  width: 24px;
+  height: 24px;
+}
+.lp-contact-info {
+  padding: 1rem;
+  color: #000000;
+}
+
+.lp-contact-info h2 {
+  color: #000000;
+  margin-bottom: 1rem;
+}
+
+.lp-contact-info p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.lp-contact-info a {
+  color: #93c5fd;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.lp-contact-info a:hover {
+  text-decoration: underline;
+}
+
+.lp-map {
+  width: 100%;
+  height: 300px;
+  border-radius: 0.5rem;
+  border: none;
+}
+
+/* Footer */
+.lp-footer {
+  background: linear-gradient(90deg, #172554, #1e3a8a);
+  color: #fff;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+.lp-footer-content {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.lp-footer-content p {
+  font-size: 1rem;
+  font-weight: 400;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Back to Top Button */
+.lp-back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background: #60a5fa;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s;
+}
+
+.lp-back-to-top:hover {
+  transform: translateY(-3px);
+}
+
+/* Animations */
+.lp-animate-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  transition: opacity 2s ease-out, transform 2s ease-out;
+}
+
+.lp-hero,
+.lp-clubs-section,
+.about-hive-section,
+.events-section,
+.lp-contact-section {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .lp-nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #1f2937;
+    flex-direction: column;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .lp-homepage.lp-dark-mode .lp-nav-links {
+    background: #fff;
+  }
+
+  .lp-nav-links.lp-open {
+    display: flex;
+    align-items: center;
+  }
+
+  .lp-nav-links-center {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .lp-nav-link {
+    margin: 0.5rem 0;
+  }
+
+  .lp-nav-register {
+    margin: 0.5rem 0;
+  }
+
+  .lp-profile-photo {
+    margin-top: 1rem;
+  }
+
+  .lp-hamburger {
+    display: flex;
+  }
+
+  .lp-hero-content h2 {
+    font-size: 3rem;
+  }
+
+  .lp-hero-content p {
+    font-size: 1.3rem;
+  }
+
+  .section-heading {
+    font-size: 2rem;
+  }
+
+  .lp-hero {
+    min-height: 90vh;
+  }
+
+  .lp-hero-image {
+    filter: blur(6px);
+    transform: scale(1.05);
+  }
+
+  .lp-contact-content {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-contact-info {
+    padding: 1rem;
+  }
+
+  .about-hive-section {
+    padding: 3rem 5%;
+  }
+
+  .events-section {
+    padding: 3rem 5%;
+  }
+
+  .lp-contact-section {
+    padding: 2rem 1rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .lp-contact-content {
+    grid-template-columns: 1fr 1fr;
+  }
+}
