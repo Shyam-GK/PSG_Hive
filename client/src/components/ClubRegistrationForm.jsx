@@ -17,8 +17,8 @@ const ClubRegistrationForm = () => {
 
   const fetchUserDetails = async () => {
     try {
-      console.log("Fetching user details from ${API_BASE_URL}/student/me...");
-      const response = await axios.get('/student/me', {
+      console.log(`Fetching user details from ${API_BASE_URL}/student/me...`);
+      const response = await axios.get(`${API_BASE_URL}/student/me`, {
         withCredentials: true,
       });
       console.log("User details fetched successfully:", response.data);
@@ -35,8 +35,8 @@ const ClubRegistrationForm = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("Attempting to fetch clubs from ${API_BASE_URL}/student/available-clubs...");
-      const response = await axios.get('/student/available-clubs', {
+      console.log(`Attempting to fetch clubs from ${API_BASE_URL}/student/available-clubs...`);
+      const response = await axios.get(`${API_BASE_URL}/student/available-clubs`, {
         timeout: 5000,
         withCredentials: true,
       });
@@ -110,8 +110,8 @@ const ClubRegistrationForm = () => {
   const confirmSubmission = async () => {
     try {
       const preferences = applications.map((app) => app.clubId);
-      console.log("Submitting registration to ${API_BASE_URL}/student/register-club:", { preferences });
-      const response = await axios.post('/student/register-club', {
+      console.log(`Submitting registration to ${API_BASE_URL}/student/register-club:`, { preferences });
+      const response = await axios.post(`${API_BASE_URL}/student/register-club`, {
         preferences,
       }, {
         withCredentials: true,
