@@ -3,6 +3,10 @@ const pool = require('../config/db');
 console.log("Pool object:", pool);
 console.log("Postgres pool object in model:", typeof pool?.query);
 
+if (typeof pool.query !== 'function') {
+  throw new Error('Database pool is not properly initialized. pool.query is not a function.');
+}
+
 const getStudentProfile = async (studentId) => {
   if (!studentId) {
     throw new Error("Missing required parameter: studentId");
@@ -60,7 +64,11 @@ const getStudentProfile = async (studentId) => {
       email: userResult.rows[0].email ?? 'N/A',
       dept: userResult.rows[0].dept ?? 'N/A',
       class: userResult.rows[0].class ?? 'N/A',
-      clubs: clubsResult.rows,
+      clubs: clubsResult.rows.map(club => ({
+        club_id: club.club_id ?? 'N/A',
+        club_name: club.club_name ?? 'N/A',
+        type: club.type ?? 'N/A',
+      })),
     };
     console.log("getStudentProfile result:", profile);
     return profile;

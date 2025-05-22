@@ -9,14 +9,21 @@ const getStudentProfile = async (req, res) => {
 
     console.log("Received studentId:", studentId, "userId:", userId, "role:", userRole);
 
-    if (userRole !== "admin" && userId !== studentId) {
-      console.log("Access denied: User can only view their own profile or admin required");
-      return res.status(403).json({ error: "Forbidden: You can only view your own profile" });
-    }
-
     if (!studentId || studentId.trim() === '') {
       console.log("Validation failed: Missing or empty studentId");
       return res.status(400).json({ error: "Missing or empty student_id" });
+    }
+
+    // Validate studentId format (alphanumeric, underscores, hyphens, max 50 chars)
+    const studentIdRegex = /^[a-zA-Z0-9_-]{1,50}$/;
+    if (!studentIdRegex.test(studentId)) {
+      console.log("Validation failed: Invalid studentId format");
+      return res.status(400).json({ error: "Invalid student_id format" });
+    }
+
+    if (userRole !== "admin" && userId.toLowerCase() !== studentId.toLowerCase()) {
+      console.log("Access denied: User can only view their own profile or admin required");
+      return res.status(403).json({ error: "Forbidden: You can only view your own profile" });
     }
 
     const profile = await getStudentProfileModel(studentId);

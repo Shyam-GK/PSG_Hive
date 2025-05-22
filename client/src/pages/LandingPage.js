@@ -57,13 +57,9 @@ export default function LandingPage() {
 
   // Handle profile navigation
   const handleProfileClick = () => {
-    const isLoggedIn = getCookie('isLoggedIn');
-    if (isLoggedIn === 'true') {
+    
       navigate('/student-profile');
-    } else {
-      alert('Please log in to view your profile.');
-      navigate('/login');
-    }
+    
   };
 
   // Smooth scrolling for navbar links

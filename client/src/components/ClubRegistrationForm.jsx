@@ -121,7 +121,7 @@ const ClubRegistrationForm = () => {
       });
       setApplications([]);
       setShowConfirm(false);
-      navigate('/profile');
+      navigate('/');
     } catch (err) {
       console.error("Submission error:", err.response?.data || err.message);
       const errorMessage = err.response?.data?.error || 'Failed to submit preferences';

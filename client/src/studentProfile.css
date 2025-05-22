@@ -377,3 +377,8 @@ body, html {
     left: -150%;
   }
 }
+.admin-view-label {
+  font-size: 0.8em;
+  color: #ff9800;
+  margin-left: 8px;
+}

@@ -17,7 +17,10 @@ const StudentProfile = () => {
 
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   const loggedInUserId = localStorage.getItem('userId');
-  const studentId = studentIdFromParams || loggedInUserId;
+  const role = localStorage.getItem('role');
+  const studentId = (studentIdFromParams || loggedInUserId)?.toLowerCase();
+
+  console.log('[StudentProfile] Determined studentId:', studentId, 'isLoggedIn:', isLoggedIn, 'role:', role);
 
   const fetchProfile = useCallback(async (id) => {
     if (!id) {
@@ -43,7 +46,7 @@ const StudentProfile = () => {
       });
     } catch (err) {
       console.error("Error fetching profile:", err.response?.data || err.message);
-      const errorMessage = err.response?.data?.error || 'Please log in to view your profile';
+      const errorMessage = err.response?.data?.error || 'Failed to fetch profile. Please try again.';
       setError(errorMessage);
       toast.error(errorMessage, {
         position: 'bottom-right',
@@ -54,11 +57,16 @@ const StudentProfile = () => {
           borderRadius: '8px',
         },
       });
-      if (err.response?.status === 401 || err.response?.status === 403) {
+      if (err.response?.status === 401) {
+        console.log('Received 401 Unauthorized, clearing auth state and redirecting to login');
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('role');
         localStorage.removeItem('userId');
+        document.cookie = 'jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
         navigate('/login');
+      } else if (err.response?.status === 403) {
+        console.log('Received 403 Forbidden, redirecting to login or showing access denied');
+        setError('Access denied: You can only view your own profile or need admin privileges.');
       }
     } finally {
       setLoading(false);
@@ -66,12 +74,18 @@ const StudentProfile = () => {
   }, [navigate]);
 
   const handleLogout = async () => {
+    if (!isLoggedIn) {
+      console.log('User not logged in, redirecting to login');
+      navigate('/login');
+      return;
+    }
     try {
       console.log(`Logging out via ${API_BASE_URL}/api/auth/logout`);
       await axios.post(`${API_BASE_URL}/api/auth/logout`, {}, { withCredentials: true });
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('role');
       localStorage.removeItem('userId');
+      document.cookie = 'jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
       toast.success('Logged out successfully', {
         position: 'bottom-right',
         autoClose: 2000,
@@ -79,16 +93,26 @@ const StudentProfile = () => {
       navigate('/login');
     } catch (err) {
       console.error('Logout failed:', err.response?.data || err.message);
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('role');
+      localStorage.removeItem('userId');
+      document.cookie = 'jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
       toast.error('Failed to logout. Please try again.', {
         position: 'bottom-right',
         autoClose: 3000,
       });
+      navigate('/login');
     }
   };
 
   useEffect(() => {
-    if (!isLoggedIn && !studentId) {
+    if (!isLoggedIn) {
       console.log('User not logged in, redirecting to login');
+      navigate('/login');
+      return;
+    }
+    if (!studentId) {
+      console.log('No studentId provided and no userId in localStorage, redirecting to login');
       navigate('/login');
       return;
     }
@@ -145,13 +169,14 @@ const StudentProfile = () => {
         <div className="logo-container">
           <span className="site-logo-text">HIVE by PSG TECH</span>
         </div>
-        <nav className="profile-nav">
-          <Link to="/clubs" className="nav-link">Back to Clubs</Link>
-          <button className="logout-button" onClick={handleLogout}>Logout</button>
-        </nav>
       </header>
 
-      <h1 className="profile-title">{profile?.name ? `${profile.name}'s Profile` : 'Profile'}</h1>
+      <h1 className="profile-title">
+        {profile?.name ? `${profile.name}'s Profile` : 'Profile'}
+        {role === 'admin' && studentId !== loggedInUserId?.toLowerCase() && (
+          <span className="admin-view-label"> (Viewing as Admin)</span>
+        )}
+      </h1>
 
       <div className="profile-content">
         <div className="avatar-container">
