@@ -1,23 +1,38 @@
 const { getStudentProfile: getStudentProfileModel } = require("../models/profileModel");
 
-console.log("Imported profileModel type:", typeof getStudentProfileModel);
-console.dir(getStudentProfileModel);
-console.log("studentModel module path:", require.resolve("../models/profileModel"));
-
 const getStudentProfile = async (req, res) => {
-  console.log("Handling getStudentProfile, params:", req.params);
+  console.log("Handling getStudentProfile, user:", req.user);
   try {
     const { studentId } = req.params;
-    console.log("Received studentId:", studentId);
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    console.log("Received studentId:", studentId, "userId:", userId, "role:", userRole);
+
+    if (userRole !== "admin" && userId !== studentId) {
+      console.log("Access denied: User can only view their own profile or admin required");
+      return res.status(403).json({ error: "Forbidden: You can only view your own profile" });
+    }
+
     if (!studentId || studentId.trim() === '') {
       console.log("Validation failed: Missing or empty studentId");
       return res.status(400).json({ error: "Missing or empty student_id" });
     }
+
     const profile = await getStudentProfileModel(studentId);
-    console.log("Sending profile response:", profile);
-    res.status(200).json(profile);
+    const normalizedProfile = {
+      user_id: profile.user_id,
+      student_id: profile.user_id,
+      name: profile.name ?? 'N/A',
+      email: profile.email ?? 'N/A',
+      dept: profile.dept ?? 'N/A',
+      class: profile.class ?? 'N/A',
+      clubs: Array.isArray(profile.clubs) ? profile.clubs : [],
+    };
+    console.log("Sending profile response:", normalizedProfile);
+    res.status(200).json(normalizedProfile);
   } catch (error) {
-    console.error("Error in getStudentProfile:", error);
+    console.error("Error in getStudentProfile:", error.message, error.stack);
     if (error.message === "Student not found") {
       return res.status(404).json({ error: "Student not found" });
     }

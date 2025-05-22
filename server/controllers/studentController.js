@@ -1,14 +1,12 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken'); 
-
 const { v4: uuidv4 } = require('uuid');
 
 // Helper function to generate 10-character UUID
 const generateShortUUID = () => {
   return uuidv4().replace(/-/g, '').substring(0, 10);
 };
-
 
 // Student login
 const loginStudent = async (req, res) => {
@@ -34,32 +32,28 @@ const loginStudent = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    res.cookie("isLoggedIn", "true", {
+    // Generate JWT
+    const token = jwt.sign(
+      { id: user.user_id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    // Set JWT cookie
+    res.cookie("jwt", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/",
-    });
-    res.cookie("role", "student", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/",
-    });
-    res.cookie("user_id", user.user_id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 60 * 60 * 1000,
       path: "/",
     });
 
-    console.log(`Cookies set for user ${user.user_id}: isLoggedIn=true, role=student, user_id=${user.user_id}`);
+    console.log(`JWT cookie set for user ${user.user_id}: jwt=${token}`);
 
     res.status(200).json({
-      user: { user_id: user.user_id, name: user.name, email: user.email, dept: user.dept },
+      success: true,
+      message: "Login successful",
+      user: { id: user.user_id, name: user.name, email: user.email, dept: user.dept, role: user.role },
     });
   } catch (error) {
     console.error("Error in loginStudent:", error.message, error.stack);
@@ -70,13 +64,8 @@ const loginStudent = async (req, res) => {
 // Get club list for registration
 const getClubList = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    console.log(`Cookies received in getClubList: isLoggedIn=${isLoggedIn}, role=${role}`);
-
-    if (!isLoggedIn || role !== "student") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "student") {
+      return res.status(403).json({ error: "Forbidden: Student role required" });
     }
 
     const query = `
@@ -95,6 +84,7 @@ const getClubList = async (req, res) => {
       ORDER BY club_name;
     `;
     const clubs = await pool.query(query);
+    console.log("Club list fetched:", clubs.rows);
     res.status(200).json(clubs.rows);
   } catch (err) {
     console.error("Error fetching club list:", err.message, err.stack);
@@ -105,12 +95,9 @@ const getClubList = async (req, res) => {
 // Get registration status
 const getRegistrationStatus = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-    const user_id = req.cookies.user_id;
-
-    if (!isLoggedIn || role !== "student") {
-      return res.status(401).json({ error: "Unauthorized" });
+    const user_id = req.user.id;
+    if (req.user.role !== "student") {
+      return res.status(403).json({ error: "Forbidden: Student role required" });
     }
 
     const userQuery = 'SELECT user_id, passout_year, can_select_clubs FROM "Users" WHERE user_id = $1 AND role = \'student\'';
@@ -124,11 +111,12 @@ const getRegistrationStatus = async (req, res) => {
     const regResult = await pool.query(regQuery, [user_id]);
     const hasRegistered = regResult.rowCount > 0;
 
+    console.log("Registration status:", { hasRegistered, canSelectClubs: user.can_select_clubs });
     res.status(200).json({
       hasRegistered,
-      canSelectClubs: user.can_select_clubs,
+      canSelectClubs: user.can_select_clubs ?? true, // Fallback if column missing
       userPassoutYear: user.passout_year,
-      canRegister: user.can_select_clubs && !hasRegistered,
+      canRegister: (user.can_select_clubs ?? true) && !hasRegistered,
     });
   } catch (err) {
     console.error("Error fetching registration status:", err.message, err.stack);
@@ -137,31 +125,23 @@ const getRegistrationStatus = async (req, res) => {
 };
 
 // Submit preferences
-
-
 const submitPreferences = async (req, res) => {
   const { preferences } = req.body;
+  const maxClubsAllowed = 3;
   
   try {
-    // 1. Authentication
-    const token = req.cookies.jwt;
-    if (!token) return res.status(401).json({ error: "Unauthorized: No token provided" });
-    
-    // 2. Token Verification
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const student_id = decoded.id;
-    const role = decoded.role;
-    
-    if (role !== "student") {
-      return res.status(401).json({ error: "Unauthorized: Only students can submit preferences" });
+    const student_id = req.user.id;
+    console.log("Submitting preferences for student:", student_id, "Preferences:", preferences);
+    if (req.user.role !== "student") {
+      return res.status(403).json({ error: "Forbidden: Student role required" });
     }
 
-    // 3. Input Validation
-    if (!Array.isArray(preferences) || preferences.length === 0) {
-      return res.status(400).json({ error: "Preferences array is required and must not be empty" });
+    // Input Validation
+    if (!Array.isArray(preferences) || preferences.length !== maxClubsAllowed) {
+      return res.status(400).json({ error: `Exactly ${maxClubsAllowed} club preferences are required` });
     }
 
-    // 4. Check User Status
+    // Check User Status
     const userResult = await pool.query(
       'SELECT can_select_clubs FROM "Users" WHERE user_id = $1 AND role = \'student\'', 
       [student_id]
@@ -171,35 +151,37 @@ const submitPreferences = async (req, res) => {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    const { can_select_clubs } = userResult.rows[0];
+    const can_select_clubs = userResult.rows[0].can_select_clubs ?? true; // Fallback
+    console.log("Can select clubs:", can_select_clubs);
     if (!can_select_clubs) {
       return res.status(403).json({ 
         error: "Registration is closed. You cannot modify preferences anymore."
       });
     }
 
-    // 5. Begin Transaction
+    // Begin Transaction
     await pool.query('BEGIN');
 
     try {
-      // 6. Delete existing records (child table first)
+      // Delete existing records
+      console.log("Deleting existing Allotment and Registrations for student:", student_id);
       await pool.query('DELETE FROM "Allotment" WHERE student_id = $1', [student_id]);
       await pool.query('DELETE FROM "Registrations" WHERE student_id = $1', [student_id]);
 
-      // 7. Calculate deadline (7 days from now)
+      // Calculate deadline (7 days from now)
       const deadline = new Date();
       deadline.setDate(deadline.getDate() + 7);
 
-      // 8. Insert new registrations and collect reg_ids
+      // Insert new registrations and collect reg_ids
       const regIds = [];
       for (let i = 0; i < preferences.length; i++) {
-        const reg_id = uuidv4().replace(/-/g, '').substring(0, 10); // 10-char UUID
+        const reg_id = generateShortUUID();
         const club_id = preferences[i];
         const pref_value = i + 1;
 
         // Verify club exists
         const clubCheck = await pool.query(
-          'SELECT 1 FROM "Clubs" WHERE club_id = $1', 
+          'SELECT club_name FROM "Clubs" WHERE club_id = $1', 
           [club_id]
         );
         
@@ -207,8 +189,10 @@ const submitPreferences = async (req, res) => {
           await pool.query('ROLLBACK');
           return res.status(400).json({ error: `Club with ID ${club_id} does not exist` });
         }
+        console.log(`Club ${club_id} (${clubCheck.rows[0].club_name}) verified`);
 
         // Insert registration
+        console.log(`Inserting registration: reg_id=${reg_id}, club_id=${club_id}, pref_value=${pref_value}`);
         await pool.query(
           `INSERT INTO "Registrations" 
           (reg_id, student_id, club_id, pref_value, reg_at, deadline) 
@@ -218,42 +202,38 @@ const submitPreferences = async (req, res) => {
         regIds.push({ reg_id, club_id });
       }
 
-      // 9. Insert into Allotment table with all required columns
+      // Insert into Allotment table
       for (let i = 0; i < regIds.length; i++) {
         const { reg_id, club_id } = regIds[i];
-        const allotment_id = uuidv4().replace(/-/g, '').substring(0, 10); // 10-char UUID
-        
+        const type = i === 0 ? 'Primary' : 'Associate';
+        console.log(`Inserting allotment: reg_id=${reg_id}, club_id=${club_id}, type=${type}`);
         await pool.query(
           `INSERT INTO "Allotment" 
-          ( reg_id, student_id, club_id, alloted_at, status, type) 
-          VALUES ($1, $2, $3,  NOW(), $4, $5)`,
-          [
-            //allotment_id,
-            reg_id,
-            student_id,
-            club_id,
-            'Active', // Initial status
-            i === 0 ? 'Primary' : 'Associate' // First preference is Primary
-          ]
+          (reg_id, student_id, club_id, alloted_at, status, type) 
+          VALUES ($1, $2, $3, NOW(), $4, $5)`,
+          [reg_id, student_id, club_id, 'Active', type]
         );
       }
 
-      // 10. Update user status
+      // Update user status
+      console.log("Updating user can_select_clubs to false for student:", student_id);
       await pool.query(
         'UPDATE "Users" SET can_select_clubs = false WHERE user_id = $1',
         [student_id]
       );
 
-      // 11. Commit transaction
+      // Commit transaction
       await pool.query('COMMIT');
+      console.log("Preferences and allotments updated successfully for student:", student_id);
       res.status(200).json({ message: "Preferences and allotments updated successfully" });
       
     } catch (err) {
       await pool.query('ROLLBACK');
-      console.error("Database error details:", {
+      console.error("Database error in submitPreferences:", {
         message: err.message,
         query: err.query,
-        parameters: err.parameters
+        parameters: err.parameters,
+        stack: err.stack
       });
       res.status(500).json({ 
         error: "Database operation failed",
@@ -261,7 +241,7 @@ const submitPreferences = async (req, res) => {
       });
     }
   } catch (err) {
-    console.error("Error in submitPreferences:", err);
+    console.error("Error in submitPreferences:", err.message, err.stack);
     res.status(500).json({ 
       error: "Internal server error", 
       details: err.message 
@@ -269,17 +249,13 @@ const submitPreferences = async (req, res) => {
   }
 };
 
-
 // Get student's preferences
 const getPreferences = async (req, res) => {
-  const student_id = req.cookies.user_id;
+  const student_id = req.user.id;
 
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "student") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "student") {
+      return res.status(403).json({ error: "Forbidden: Student role required" });
     }
 
     const query = `
@@ -290,6 +266,7 @@ const getPreferences = async (req, res) => {
       ORDER BY r.pref_value;
     `;
     const preferences = await pool.query(query, [student_id]);
+    console.log("Preferences fetched:", preferences.rows);
     res.status(200).json(preferences.rows);
   } catch (err) {
     console.error("Error fetching preferences:", err.message, err.stack);
@@ -299,14 +276,11 @@ const getPreferences = async (req, res) => {
 
 // Get student's allotment
 const getAllotment = async (req, res) => {
-  const student_id = req.cookies.user_id;
+  const student_id = req.user.id;
 
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "student") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "student") {
+      return res.status(403).json({ error: "Forbidden: Student role required" });
     }
 
     const query = `
@@ -317,6 +291,7 @@ const getAllotment = async (req, res) => {
       ORDER BY a.alloted_at DESC;
     `;
     const allotment = await pool.query(query, [student_id]);
+    console.log("Allotment fetched:", allotment.rows);
     res.status(200).json(allotment.rows);
   } catch (err) {
     console.error("Error fetching allotment:", err.message, err.stack);
@@ -324,7 +299,53 @@ const getAllotment = async (req, res) => {
   }
 };
 
+// Get student profile
+const getStudentProfile = async (req, res) => {
+  console.log("Handling getStudentProfile, user:", req.user);
+  try {
+    const studentId = req.user.id;
+    console.log("Fetching profile for studentId:", studentId);
+
+    // Fetch student details
+    const userQuery = `
+      SELECT user_id, name, email, dept, class
+      FROM public."Users"
+      WHERE user_id ILIKE $1;
+    `;
+    const userResult = await pool.query(userQuery, [studentId]);
+
+    if (!userResult.rows[0]) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Fetch club memberships
+    const clubsQuery = `
+      SELECT 
+        c.club_id,
+        c.club_name,
+        a.type
+      FROM public."Allotment" a
+      JOIN public."Clubs" c ON a.club_id = c.club_id
+      WHERE a.student_id ILIKE $1 AND a.status = 'Active';
+    `;
+    const clubsResult = await pool.query(clubsQuery, [studentId]);
+
+    const profile = {
+      ...userResult.rows[0],
+      student_id: userResult.rows[0].user_id,
+      clubs: clubsResult.rows,
+    };
+
+    console.log("Sending profile response:", profile);
+    res.status(200).json(profile);
+  } catch (error) {
+    console.error("Error in getStudentProfile:", error.message, error.stack);
+    res.status(500).json({ error: `Failed to fetch profile: ${error.message}` });
+  }
+};
+
 module.exports = {
+  getStudentProfile,
   loginStudent,
   getClubList,
   getRegistrationStatus,

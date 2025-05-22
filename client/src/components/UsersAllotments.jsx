@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import '../styles/AdminDashboard.css';
-import API_BASE_URL from "../api"; 
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../styles/AdminDashboard.css";
+import API_BASE_URL from "../api";
 
 const UsersAllotments = () => {
   const [usersAllotments, setUsersAllotments] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
-    dept: '',
-    club_name: '',
-    type: '',
-    status: '',
-    alloted_at_start: '',
-    alloted_at_end: '',
+    dept: "",
+    club_name: "",
+    type: "",
+    status: "",
+    alloted_at_start: "",
+    alloted_at_end: "",
   });
   const [uniqueValues, setUniqueValues] = useState({
     dept: [],
@@ -27,15 +27,23 @@ const UsersAllotments = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/admin/users-allotments`, { withCredentials: true });
-      const data = response.data;
+      const response = await axios.get(`${API_BASE_URL}/admin/users-allotments`, {
+        withCredentials: true,
+      });
+      console.log("Users allotments response:", response.data); // Debug response
+      const data = response.data.data || [];
+
+      if (!Array.isArray(data)) {
+        throw new Error("Unexpected response format: Data is not an array");
+      }
+
       setUsersAllotments(data);
       setFilteredData(data);
 
-      const uniqueDepts = [...new Set(data.map(item => item.dept))].sort();
-      const uniqueClubNames = [...new Set(data.map(item => item.club_name))].sort();
-      const uniqueTypes = [...new Set(data.map(item => item.type))].sort();
-      const uniqueStatuses = [...new Set(data.map(item => item.status))].sort();
+      const uniqueDepts = [...new Set(data.map((item) => item.dept))].sort();
+      const uniqueClubNames = [...new Set(data.map((item) => item.club_name))].sort();
+      const uniqueTypes = [...new Set(data.map((item) => item.type))].sort();
+      const uniqueStatuses = [...new Set(data.map((item) => item.status))].sort();
 
       setUniqueValues({
         dept: uniqueDepts,
@@ -46,7 +54,9 @@ const UsersAllotments = () => {
       setLoading(false);
     } catch (err) {
       console.error("Error fetching users allotments:", err.response?.data || err.message);
-      setError('Failed to load users allotments. Please try again.');
+      setError(err.response?.data?.message || "Failed to load users allotments. Please try again.");
+      setUsersAllotments([]);
+      setFilteredData([]);
       setLoading(false);
     }
   };
@@ -63,8 +73,12 @@ const UsersAllotments = () => {
   const applyFilters = () => {
     const filtered = usersAllotments.filter((allotment) => {
       const allotedAt = new Date(allotment.alloted_at);
-      const startDate = filterInputs.alloted_at_start ? new Date(filterInputs.alloted_at_start) : null;
-      const endDate = filterInputs.alloted_at_end ? new Date(filterInputs.alloted_at_end) : null;
+      const startDate = filterInputs.alloted_at_start
+        ? new Date(filterInputs.alloted_at_start)
+        : null;
+      const endDate = filterInputs.alloted_at_end
+        ? new Date(filterInputs.alloted_at_end)
+        : null;
 
       return (
         (filterInputs.dept ? allotment.dept === filterInputs.dept : true) &&
@@ -79,16 +93,17 @@ const UsersAllotments = () => {
   };
 
   const downloadCSV = () => {
-    const headers = ['User ID,Name,Department,Club,Type,Status,Allotted At'];
-    const rows = filteredData.map(allotment =>
-      `${allotment.user_id},${allotment.name},${allotment.dept},${allotment.club_name},${allotment.type},${allotment.status},${new Date(allotment.alloted_at).toLocaleString()}`
+    const headers = ["User ID,Name,Department,Club,Type,Status,Allotted At"];
+    const rows = filteredData.map(
+      (allotment) =>
+        `${allotment.user_id},${allotment.name},${allotment.dept},${allotment.club_name},${allotment.type},${allotment.status},${new Date(allotment.alloted_at).toLocaleString()}`
     );
-    const csvContent = [...headers, ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const csvContent = [...headers, ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'users_allotments.csv';
+    a.download = "users_allotments.csv";
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -220,32 +235,39 @@ const UsersAllotments = () => {
               Download as CSV
             </button>
           </div>
-          <table className="summary-table">
-            <thead>
-              <tr>
-                <th>User ID</th>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Club</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Allotted At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((allotment, index) => (
-                <tr key={index} className={allotment.type === 'Primary' ? 'primary-row' : ''}>
-                  <td>{allotment.user_id}</td>
-                  <td>{allotment.name}</td>
-                  <td>{allotment.dept}</td>
-                  <td>{allotment.club_name}</td>
-                  <td>{allotment.type}</td>
-                  <td>{allotment.status}</td>
-                  <td>{new Date(allotment.alloted_at).toLocaleString()}</td>
+          {filteredData.length === 0 ? (
+            <p>No allotments match the applied filters.</p>
+          ) : (
+            <table className="summary-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Club</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Allotted At</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredData.map((allotment, index) => (
+                  <tr
+                    key={index}
+                    className={allotment.type === "Primary" ? "primary-row" : ""}
+                  >
+                    <td>{allotment.user_id}</td>
+                    <td>{allotment.name}</td>
+                    <td>{allotment.dept}</td>
+                    <td>{allotment.club_name}</td>
+                    <td>{allotment.type}</td>
+                    <td>{allotment.status}</td>
+                    <td>{new Date(allotment.alloted_at).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
       )}
     </div>

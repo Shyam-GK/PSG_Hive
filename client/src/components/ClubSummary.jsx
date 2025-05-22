@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import '../styles/AdminDashboard.css';
-import API_BASE_URL from "../api"; 
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../styles/AdminDashboard.css";
+import API_BASE_URL from "../api";
+
 const ClubSummary = () => {
   const [clubSummary, setClubSummary] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
-    total_available_min: '',
-    total_available_max: '',
-    total_allocated_min: '',
-    total_allocated_max: '',
-    seats_left_min: '',
-    seats_left_max: '',
+    total_available_min: "",
+    total_available_max: "",
+    total_allocated_min: "",
+    total_allocated_max: "",
+    seats_left_min: "",
+    seats_left_max: "",
   });
   const [ranges, setRanges] = useState({
     total_available: { min: 0, max: 0 },
@@ -25,34 +26,43 @@ const ClubSummary = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/admin/club-summary`, { withCredentials: true });
-      const data = response.data;
+      const response = await axios.get(`${API_BASE_URL}/admin/club-summary`, {
+        withCredentials: true,
+      });
+      console.log("Club summary response:", response.data); // Debug response
+      const data = response.data.data || [];
+
+      if (!Array.isArray(data)) {
+        throw new Error("Unexpected response format: Data is not an array");
+      }
+
       setClubSummary(data);
       setFilteredData(data);
 
-      // Compute min and max for numeric columns
-      const totalAvailableValues = data.map(item => item.total_available);
-      const totalAllocatedValues = data.map(item => item.total_allocated);
-      const seatsLeftValues = data.map(item => item.seats_left);
+      const totalAvailableValues = data.map((item) => item.total_available);
+      const totalAllocatedValues = data.map((item) => item.total_allocated);
+      const seatsLeftValues = data.map((item) => item.seats_left);
 
       setRanges({
         total_available: {
-          min: Math.min(...totalAvailableValues),
-          max: Math.max(...totalAvailableValues),
+          min: data.length ? Math.min(...totalAvailableValues) : 0,
+          max: data.length ? Math.max(...totalAvailableValues) : 0,
         },
         total_allocated: {
-          min: Math.min(...totalAllocatedValues),
-          max: Math.max(...totalAllocatedValues),
+          min: data.length ? Math.min(...totalAllocatedValues) : 0,
+          max: data.length ? Math.max(...totalAllocatedValues) : 0,
         },
         seats_left: {
-          min: Math.min(...seatsLeftValues),
-          max: Math.max(...seatsLeftValues),
+          min: data.length ? Math.min(...seatsLeftValues) : 0,
+          max: data.length ? Math.max(...seatsLeftValues) : 0,
         },
       });
       setLoading(false);
     } catch (err) {
       console.error("Error fetching club summary:", err.response?.data || err.message);
-      setError('Failed to load club summary. Please try again.');
+      setError(err.response?.data?.message || "Failed to load club summary. Please try again.");
+      setClubSummary([]);
+      setFilteredData([]);
       setLoading(false);
     }
   };
@@ -68,12 +78,24 @@ const ClubSummary = () => {
 
   const applyFilters = () => {
     const filtered = clubSummary.filter((club) => {
-      const totalAvailableMin = filterInputs.total_available_min ? parseInt(filterInputs.total_available_min) : -Infinity;
-      const totalAvailableMax = filterInputs.total_available_max ? parseInt(filterInputs.total_available_max) : Infinity;
-      const totalAllocatedMin = filterInputs.total_allocated_min ? parseInt(filterInputs.total_allocated_min) : -Infinity;
-      const totalAllocatedMax = filterInputs.total_allocated_max ? parseInt(filterInputs.total_allocated_max) : Infinity;
-      const seatsLeftMin = filterInputs.seats_left_min ? parseInt(filterInputs.seats_left_min) : -Infinity;
-      const seatsLeftMax = filterInputs.seats_left_max ? parseInt(filterInputs.seats_left_max) : Infinity;
+      const totalAvailableMin = filterInputs.total_available_min
+        ? parseInt(filterInputs.total_available_min)
+        : -Infinity;
+      const totalAvailableMax = filterInputs.total_available_max
+        ? parseInt(filterInputs.total_available_max)
+        : Infinity;
+      const totalAllocatedMin = filterInputs.total_allocated_min
+        ? parseInt(filterInputs.total_allocated_min)
+        : -Infinity;
+      const totalAllocatedMax = filterInputs.total_allocated_max
+        ? parseInt(filterInputs.total_allocated_max)
+        : Infinity;
+      const seatsLeftMin = filterInputs.seats_left_min
+        ? parseInt(filterInputs.seats_left_min)
+        : -Infinity;
+      const seatsLeftMax = filterInputs.seats_left_max
+        ? parseInt(filterInputs.seats_left_max)
+        : Infinity;
 
       return (
         club.total_available >= totalAvailableMin &&
@@ -88,16 +110,17 @@ const ClubSummary = () => {
   };
 
   const downloadCSV = () => {
-    const headers = ['Club Name,Total Available,Total Allocated,Seats Left'];
-    const rows = filteredData.map(club =>
-      `${club.club_name},${club.total_available},${club.total_allocated},${club.seats_left}`
+    const headers = ["Club Name,Total Available,Total Allocated,Seats Left"];
+    const rows = filteredData.map(
+      (club) =>
+        `${club.club_name},${club.total_available},${club.total_allocated},${club.seats_left}`
     );
-    const csvContent = [...headers, ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const csvContent = [...headers, ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'club_summary.csv';
+    a.download = "club_summary.csv";
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -204,44 +227,48 @@ const ClubSummary = () => {
               Apply Filters
             </button>
             <button className="download-button" onClick={downloadCSV}>
-            <svg
+              <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 width="20"
                 height="20"
-            >
+              >
                 <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                 />
-            </svg>
-            Download as CSV
+              </svg>
+              Download as CSV
             </button>
           </div>
-          <table className="summary-table">
-            <thead>
-              <tr>
-                <th>Club Name</th>
-                <th>Total Available</th>
-                <th>Total Allocated</th>
-                <th>Seats Left</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((club) => (
-                <tr key={club.club_id}>
-                  <td>{club.club_name}</td>
-                  <td>{club.total_available}</td>
-                  <td>{club.total_allocated}</td>
-                  <td>{club.seats_left}</td>
+          {filteredData.length === 0 ? (
+            <p>No clubs match the applied filters.</p>
+          ) : (
+            <table className="summary-table">
+              <thead>
+                <tr>
+                  <th>Club Name</th>
+                  <th>Total Available</th>
+                  <th>Total Allocated</th>
+                  <th>Seats Left</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredData.map((club) => (
+                  <tr key={club.club_id}>
+                    <td>{club.club_name}</td>
+                    <td>{club.total_available}</td>
+                    <td>{club.total_allocated}</td>
+                    <td>{club.seats_left}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
       )}
     </div>

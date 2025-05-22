@@ -14,7 +14,7 @@ const allowedOrigins = [
   "https://psg-hive-shyam-gks-projects.vercel.app",
   "https://psg-hive-git-main-shyam-gks-projects.vercel.app"
 ];
-
+app.options("*", cors());
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {

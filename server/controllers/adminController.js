@@ -1,65 +1,82 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-// Admin login
 const loginAdmin = async (req, res) => {
   const { adm_id, password } = req.body;
 
   try {
     if (!adm_id || !password) {
-      return res.status(400).json({ error: "Admin ID and password are required" });
+      return res.status(400).json({ success: false, message: "Admin ID and password are required" });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not defined");
+      return res.status(500).json({ success: false, message: "Server configuration error" });
     }
 
     const result = await pool.query('SELECT * FROM "Admin" WHERE adm_id = $1', [adm_id]);
     if (result.rowCount === 0) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     const admin = result.rows[0];
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
+
+    const token = jwt.sign(
+      { id: admin.adm_id, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 3600 * 1000,
+      path: "/",
+    });
 
     res.cookie("isLoggedIn", "true", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.cookie("role", "admin", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
-      admin: { adm_id: admin.adm_id, name: admin.name, email: admin.email },
+      success: true,
+      message: "Login successful",
+      user: { id: admin.adm_id, name: admin.name, email: admin.email, role: "admin" },
     });
   } catch (error) {
-    console.error("Error in loginAdmin:", error.message, error.stack);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in loginAdmin:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error", details: error.message });
   }
 };
 
-// Add a new faculty member
 const addFaculty = async (req, res) => {
   const { user_id, name, email, password, dept, role } = req.body;
 
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const userRole = req.cookies.role;
-
-    if (!isLoggedIn || userRole !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     if (!user_id || !name || !email || !password || !dept || !role) {
-      return res.status(400).json({ error: "All fields are required" });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
     if (role !== "faculty") {
-      return res.status(400).json({ error: "Role must be 'faculty'" });
+      return res.status(400).json({ success: false, message: "Role must be 'faculty'" });
     }
 
     const userCheck = await pool.query(
@@ -67,7 +84,7 @@ const addFaculty = async (req, res) => {
       [user_id, email]
     );
     if (userCheck.rowCount > 0) {
-      return res.status(400).json({ error: "User ID or email already exists" });
+      return res.status(400).json({ success: false, message: "User ID or email already exists" });
     }
 
     const saltRounds = 10;
@@ -81,27 +98,23 @@ const addFaculty = async (req, res) => {
     const insertValues = [user_id, name, email, hashedPassword, dept, role, null];
     const result = await pool.query(insertQuery, insertValues);
 
-    res.status(201).json({ message: "Faculty added successfully", faculty: result.rows[0] });
+    res.status(201).json({ success: true, message: "Faculty added successfully", faculty: result.rows[0] });
   } catch (error) {
-    console.error("Error in addFaculty:", error.message, error.stack);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in addFaculty:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error", details: error.message });
   }
 };
 
-// Bulk upload users from CSV/Excel
 const uploadUsers = async (req, res) => {
   const users = req.body;
 
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     if (!Array.isArray(users) || users.length === 0) {
-      return res.status(400).json({ error: "No user data provided" });
+      return res.status(400).json({ success: false, message: "No user data provided" });
     }
 
     const saltRounds = 10;
@@ -152,24 +165,21 @@ const uploadUsers = async (req, res) => {
     }
 
     res.status(200).json({
+      success: true,
       message: "User upload completed",
       successful: successfulUsers,
       failed: failedUsers,
     });
   } catch (error) {
-    console.error("Error in uploadUsers:", error.message, error.stack);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in uploadUsers:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error", details: error.message });
   }
 };
 
-// Get real-time club status (seats left)
 const getClubStatus = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const query = `
@@ -187,62 +197,54 @@ const getClubStatus = async (req, res) => {
       ORDER BY club_name;
     `;
     const clubs = await pool.query(query);
-    res.status(200).json(clubs.rows);
+    res.status(200).json({ success: true, data: clubs.rows });
   } catch (err) {
-    console.error("Error fetching club status:", err.message, err.stack);
-    res.status(500).json({ error: "Internal server error", details: err.message });
+    console.error("Error fetching club status:", err.message);
+    res.status(500).json({ success: false, message: "Internal server error", details: err.message });
   }
 };
 
-// Update max vacancy for a club
 const updateMaxVacancy = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const { club_id } = req.params;
     const { max_vacancy } = req.body;
 
     if (!max_vacancy || max_vacancy <= 0) {
-      return res.status(400).json({ error: "Max vacancy must be a positive integer" });
+      return res.status(400).json({ success: false, message: "Max vacancy must be a positive integer" });
     }
 
     const clubResult = await pool.query('SELECT curr_allotment, min_allotment FROM "Clubs" WHERE club_id = $1', [club_id]);
     if (clubResult.rowCount === 0) {
-      return res.status(404).json({ error: "Club not found" });
+      return res.status(404).json({ success: false, message: "Club not found" });
     }
 
     const { curr_allotment, min_allotment } = clubResult.rows[0];
     if (max_vacancy < curr_allotment) {
-      return res.status(400).json({ error: "Max vacancy cannot be less than current allotment" });
+      return res.status(400).json({ success: false, message: "Max vacancy cannot be less than current allotment" });
     }
     if (max_vacancy < min_allotment) {
-      return res.status(400).json({ error: "Max vacancy cannot be less than minimum allotment" });
+      return res.status(400).json({ success: false, message: "Max vacancy cannot be less than minimum allotment" });
     }
 
     const updateResult = await pool.query(
       'UPDATE "Clubs" SET max_vacancy = $1 WHERE club_id = $2 RETURNING *',
       [max_vacancy, club_id]
     );
-    res.status(200).json({ message: "Max vacancy updated successfully", club: updateResult.rows[0] });
+    res.status(200).json({ success: true, message: "Max vacancy updated successfully", club: updateResult.rows[0] });
   } catch (error) {
-    console.error("Error in updateMaxVacancy:", error.message, error.stack);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in updateMaxVacancy:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error", details: error.message });
   }
 };
 
-// Get club summary (total available and allocated, sorted by name)
 const getClubSummary = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const result = await pool.query(`
@@ -255,21 +257,17 @@ const getClubSummary = async (req, res) => {
       FROM "Clubs"
       ORDER BY club_name
     `);
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, data: result.rows });
   } catch (error) {
-    console.error("Error in getClubSummary:", error.message, error.stack);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in getClubSummary:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error", details: error.message });
   }
 };
 
-// Get list of users not registered (sorted by dept and roll no)
 const getUsersNotRegistered = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const result = await pool.query(`
@@ -279,21 +277,17 @@ const getUsersNotRegistered = async (req, res) => {
       WHERE r.reg_id IS NULL
       ORDER BY u.dept, u.user_id
     `);
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, data: result.rows });
   } catch (error) {
-    console.error("Error in getUsersNotRegistered:", error.message, error.stack);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in getUsersNotRegistered:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error", details: error.message });
   }
 };
 
-// Get users and their allotments
 const getUsersAndAllotments = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const result = await pool.query(`
@@ -311,40 +305,36 @@ const getUsersAndAllotments = async (req, res) => {
       JOIN "Clubs" c ON a.club_id = c.club_id
       ORDER BY u.dept, u.user_id, a.type
     `);
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, data: result.rows });
   } catch (error) {
-    console.error("Error in getUsersAndAllotments:", error.message, error.stack);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in getUsersAndAllotments:", error.message);
+    res.status(500).json({ success: false, message: "Internal Server Error", details: error.message });
   }
 };
 
-// Update club's faculty advisor and PoC
 const updateClubAdvisorAndPoC = async (req, res) => {
   const { club_id } = req.params;
   const { faculty_advisor, poc, poc_phone } = req.body;
 
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const clubCheck = await pool.query('SELECT * FROM public."Clubs" WHERE club_id = $1', [club_id]);
     if (clubCheck.rows.length === 0) {
-      return res.status(404).json({ error: "Club not found" });
+      return res.status(404).json({ success: false, message: "Club not found" });
     }
 
     const userCheck = await pool.query('SELECT * FROM public."Users" WHERE user_id = $1 AND role = $2', [faculty_advisor, 'faculty']);
     if (userCheck.rows.length === 0) {
-      return res.status(400).json({ error: "Faculty Advisor must be a user with role 'faculty'" });
+      return res.status(400).json({ success: false, message: "Faculty Advisor must be a user with role 'faculty'" });
     }
 
     if (poc_phone) {
       const phonePattern = /^[0-9]{10}$/;
       if (!phonePattern.test(poc_phone)) {
-        return res.status(400).json({ error: "PoC phone number must be a 10-digit number" });
+        return res.status(400).json({ success: false, message: "PoC phone number must be a 10-digit number" });
       }
     }
 
@@ -357,21 +347,17 @@ const updateClubAdvisorAndPoC = async (req, res) => {
     const updateValues = [faculty_advisor, poc || null, poc_phone || null, club_id];
     const updatedClub = await pool.query(updateQuery, updateValues);
 
-    res.status(200).json(updatedClub.rows[0]);
+    res.status(200).json({ success: true, data: updatedClub.rows[0] });
   } catch (err) {
-    console.error("Error updating club advisor and PoC:", err.message, err.stack);
-    res.status(500).json({ error: "Internal server error", details: err.message });
+    console.error("Error updating club advisor and PoC:", err.message);
+    res.status(500).json({ success: false, message: "Internal server error", details: err.message });
   }
 };
 
-// Get list of users with role = 'faculty' for faculty advisor selection
 const getUsers = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const usersQuery = `
@@ -382,21 +368,17 @@ const getUsers = async (req, res) => {
     `;
     const users = await pool.query(usersQuery);
     console.log("Fetched users for faculty advisor:", users.rows);
-    res.status(200).json(users.rows);
+    res.status(200).json({ success: true, data: users.rows });
   } catch (err) {
-    console.error("Error fetching users:", err.message, err.stack);
-    res.status(500).json({ error: "Internal server error", details: err.message });
+    console.error("Error fetching users:", err.message);
+    res.status(500).json({ success: false, message: "Internal server error", details: err.message });
   }
 };
 
-// Get distinct passout years for registration control
 const getPassoutYears = async (req, res) => {
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const query = `
@@ -407,30 +389,25 @@ const getPassoutYears = async (req, res) => {
     `;
     const result = await pool.query(query);
     const passoutYears = result.rows.map(row => row.passout_year);
-    res.status(200).json(passoutYears);
+    res.status(200).json({ success: true, data: passoutYears });
   } catch (err) {
-    console.error("Error fetching passout years:", err.message, err.stack);
-    res.status(500).json({ error: "Internal server error", details: err.message });
+    console.error("Error fetching passout years:", err.message);
+    res.status(500).json({ success: false, message: "Internal server error", details: err.message });
   }
 };
 
-// Update registration (open/close for a specific passout year)
 const updateRegistration = async (req, res) => {
   const { passout_year, is_open } = req.body;
 
   try {
-    const isLoggedIn = req.cookies.isLoggedIn;
-    const role = req.cookies.role;
-
-    if (!isLoggedIn || role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     if (!passout_year || typeof is_open !== 'boolean') {
-      return res.status(400).json({ error: "Passout year and is_open (boolean) are required" });
+      return res.status(400).json({ success: false, message: "Passout year and is_open (boolean) are required" });
     }
 
-    // Update can_select_clubs for students with the selected passout year
     const updateUsersQuery = `
       UPDATE "Users"
       SET can_select_clubs = $1
@@ -438,10 +415,13 @@ const updateRegistration = async (req, res) => {
     `;
     await pool.query(updateUsersQuery, [is_open, passout_year]);
 
-    res.status(200).json({ message: `Registration ${is_open ? 'opened' : 'closed'} for passout year ${passout_year}` });
+    res.status(200).json({ 
+      success: true, 
+      message: `Registration ${is_open ? 'opened' : 'closed'} for passout year ${passout_year}` 
+    });
   } catch (err) {
-    console.error("Error updating registration:", err.message, err.stack);
-    res.status(500).json({ error: "Internal server error", details: err.message });
+    console.error("Error updating registration:", err.message);
+    res.status(500).json({ success: false, message: "Internal server error", details: err.message });
   }
 };
 

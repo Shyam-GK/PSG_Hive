@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Papa from "papaparse";
 import "../styles/AdminDashboard.css";
-import API_BASE_URL from "../api"; 
+import API_BASE_URL from "../api";
 
 const AdminDashboard = () => {
   const [clubStatus, setClubStatus] = useState([]);
@@ -25,16 +25,17 @@ const AdminDashboard = () => {
   const [passoutYears, setPassoutYears] = useState([]);
   const [selectedPassoutYear, setSelectedPassoutYear] = useState("");
 
-  const currentYear = new Date().getFullYear(); // Current year for calculating studying year
+  const currentYear = new Date().getFullYear();
 
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/admin/users`, { withCredentials: true });
       console.log("Fetched users for dropdown:", response.data);
-      setUsers(response.data);
+      setUsers(Array.isArray(response.data.data) ? response.data.data : []);
     } catch (err) {
       console.error("Error fetching users:", err.response?.data || err.message);
       setError("Failed to load users for faculty advisor selection.");
+      setUsers([]);
     }
   };
 
@@ -43,11 +44,13 @@ const AdminDashboard = () => {
     setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/admin/club-status`, { withCredentials: true });
-      setClubStatus(response.data);
+      console.log("Club status response:", response.data); // Debug response
+      setClubStatus(Array.isArray(response.data.data) ? response.data.data : []);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching club status:", err.response?.data || err.message);
-      setError("Failed to load club status. Please try again.");
+      setError(err.response?.data?.message || "Failed to load club status. Please try again.");
+      setClubStatus([]);
       setLoading(false);
     }
   };
@@ -55,10 +58,12 @@ const AdminDashboard = () => {
   const fetchPassoutYears = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/admin/passout-years`, { withCredentials: true });
-      setPassoutYears(response.data);
+      console.log("Passout years response:", response.data);
+      setPassoutYears(Array.isArray(response.data.data) ? response.data.data : response.data);
     } catch (err) {
       console.error("Error fetching passout years:", err.response?.data || err.message);
       setError("Failed to load passout years.");
+      setPassoutYears([]);
     }
   };
 
@@ -89,7 +94,7 @@ const AdminDashboard = () => {
       fetchClubStatus();
     } catch (err) {
       console.error("Error updating vacancy:", err.response?.data || err.message);
-      alert(`Failed to update vacancy: ${err.response?.data?.error || err.message}`);
+      alert(`Failed to update vacancy: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -122,7 +127,7 @@ const AdminDashboard = () => {
       fetchClubStatus();
     } catch (err) {
       console.error("Error updating advisor and PoC:", err.response?.data || err.message);
-      alert(`Failed to update advisor and PoC: ${err.response?.data?.error || err.message}`);
+      alert(`Failed to update advisor and PoC: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -157,7 +162,7 @@ const AdminDashboard = () => {
       setShowAddFaculty(false);
     } catch (err) {
       console.error("Error adding faculty:", err.response?.data || err.message);
-      alert(`Failed to add faculty: ${err.response?.data?.error || err.message}`);
+      alert(`Failed to add faculty: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -200,7 +205,7 @@ const AdminDashboard = () => {
           setShowUploadUsers(false);
         } catch (err) {
           console.error("Error uploading users:", err.response?.data || err.message);
-          setUploadError(`Failed to upload users: ${err.response?.data?.error || err.message}`);
+          setUploadError(`Failed to upload users: ${err.response?.data?.message || err.message}`);
         }
       },
       error: (err) => {
@@ -224,7 +229,7 @@ const AdminDashboard = () => {
       alert(`Registration ${isOpen ? "opened" : "closed"} for passout year ${selectedPassoutYear}!`);
     } catch (err) {
       console.error("Error updating registration:", err.response?.data || err.message);
-      alert(`Failed to update registration: ${err.response?.data?.error || err.message}`);
+      alert(`Failed to update registration: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -260,83 +265,87 @@ const AdminDashboard = () => {
           <section className="club-status-section fade-in">
             <h2 className="section-title">Club Status</h2>
             <div className="club-status-cards">
-              {clubStatus.map((club) => (
-                <div className="club-status-card" key={club.club_id}>
-                  <h3 className="club-name">{club.club_name}</h3>
-                  <p className="status-detail">Max Vacancy: {club.max_vacancy}</p>
-                  <p className="status-detail">Current Allotment: {club.curr_allotment}</p>
-                  <p className="status-detail">Seats Left: {club.seats_left}</p>
-                  <div className="update-vacancy">
-                    <input
-                      type="number"
-                      placeholder="New Max Vacancy"
-                      value={updateVacancy[club.club_id] || ""}
-                      onChange={(e) => handleVacancyChange(club.club_id, e.target.value)}
-                      className="vacancy-input"
-                      min="1"
-                    />
-                    <button
-                      className="update-button"
-                      onClick={() => handleUpdateVacancy(club.club_id)}
-                    >
-                      Update
-                    </button>
-                  </div>
-                  <div className="advisor-poc-section">
-                    <p className="status-detail">
-                      Faculty Advisor: {club.faculty_advisor || "Not Set"}
-                    </p>
-                    <p className="status-detail">PoC: {club.poc || "Not Set"}</p>
-                    <p className="status-detail">
-                      PoC Phone: {club.poc_phone || "Not Set"}
-                    </p>
-                    <div className="update-advisor-poc">
-                      <select
-                        value={
-                          advisorPoC[club.club_id]?.faculty_advisor ||
-                          club.faculty_advisor ||
-                          ""
-                        }
-                        onChange={(e) =>
-                          handleAdvisorPoCChange(club.club_id, "faculty_advisor", e.target.value)
-                        }
-                        className="advisor-select"
-                      >
-                        <option value="">Select Faculty Advisor</option>
-                        {users.map((user) => (
-                          <option key={user.user_id} value={user.user_id}>
-                            {user.name} ({user.user_id}) - {user.dept}
-                          </option>
-                        ))}
-                      </select>
+              {clubStatus.length === 0 ? (
+                <p>No clubs available.</p>
+              ) : (
+                clubStatus.map((club) => (
+                  <div className="club-status-card" key={club.club_id}>
+                    <h3 className="club-name">{club.club_name}</h3>
+                    <p className="status-detail">Max Vacancy: {club.max_vacancy}</p>
+                    <p className="status-detail">Current Allotment: {club.curr_allotment}</p>
+                    <p className="status-detail">Seats Left: {club.seats_left}</p>
+                    <div className="update-vacancy">
                       <input
-                        type="text"
-                        placeholder="PoC Name"
-                        value={advisorPoC[club.club_id]?.poc || club.poc || ""}
-                        onChange={(e) =>
-                          handleAdvisorPoCChange(club.club_id, "poc", e.target.value)
-                        }
-                        className="poc-input"
-                      />
-                      <input
-                        type="text"
-                        placeholder="PoC Phone (10 digits)"
-                        value={advisorPoC[club.club_id]?.poc_phone || club.poc_phone || ""}
-                        onChange={(e) =>
-                          handleAdvisorPoCChange(club.club_id, "poc_phone", e.target.value)
-                        }
-                        className="poc-input"
+                        type="number"
+                        placeholder="New Max Vacancy"
+                        value={updateVacancy[club.club_id] || ""}
+                        onChange={(e) => handleVacancyChange(club.club_id, e.target.value)}
+                        className="vacancy-input"
+                        min="1"
                       />
                       <button
                         className="update-button"
-                        onClick={() => handleUpdateAdvisorPoC(club.club_id)}
+                        onClick={() => handleUpdateVacancy(club.club_id)}
                       >
-                        Update Advisor & PoC
+                        Update
                       </button>
                     </div>
+                    <div className="advisor-poc-section">
+                      <p className="status-detail">
+                        Faculty Advisor: {club.faculty_advisor || "Not Set"}
+                      </p>
+                      <p className="status-detail">PoC: {club.poc || "Not Set"}</p>
+                      <p className="status-detail">
+                        PoC Phone: {club.poc_phone || "Not Set"}
+                      </p>
+                      <div className="update-advisor-poc">
+                        <select
+                          value={
+                            advisorPoC[club.club_id]?.faculty_advisor ||
+                            club.faculty_advisor ||
+                            ""
+                          }
+                          onChange={(e) =>
+                            handleAdvisorPoCChange(club.club_id, "faculty_advisor", e.target.value)
+                          }
+                          className="advisor-select"
+                        >
+                          <option value="">Select Faculty Advisor</option>
+                          {users.map((user) => (
+                            <option key={user.user_id} value={user.user_id}>
+                              {user.name} ({user.user_id}) - {user.dept}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="text"
+                          placeholder="PoC Name"
+                          value={advisorPoC[club.club_id]?.poc || club.poc || ""}
+                          onChange={(e) =>
+                            handleAdvisorPoCChange(club.club_id, "poc", e.target.value)
+                          }
+                          className="poc-input"
+                        />
+                        <input
+                          type="text"
+                          placeholder="PoC Phone (10 digits)"
+                          value={advisorPoC[club.club_id]?.poc_phone || club.poc_phone || ""}
+                          onChange={(e) =>
+                            handleAdvisorPoCChange(club.club_id, "poc_phone", e.target.value)
+                          }
+                          className="poc-input"
+                        />
+                        <button
+                          className="update-button"
+                          onClick={() => handleUpdateAdvisorPoC(club.club_id)}
+                        >
+                          Update Advisor & PoC
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </section>
 

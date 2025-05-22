@@ -1,10 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const ClubController = require('../controllers/clubController');
+const { getLandingPageClubs, getClubDetails, getAllClubs } = require("../controllers/clubController");
+const authenticate = require("../middleware/authMiddleware");
 
-// Specific routes should come before dynamic routes
-router.get('/landing', ClubController.getLandingPageClubs);
-router.get("/all", ClubController.getAllClubs);
-router.get('/:clubId', ClubController.getClubDetails);
+console.log("Setting up club routes...");
+
+router.get("/landing", authenticate, getLandingPageClubs);
+router.get("/all", authenticate, getAllClubs);
+router.get("/details/:clubId", authenticate, getClubDetails);
 
 module.exports = router;

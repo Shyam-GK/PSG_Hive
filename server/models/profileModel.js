@@ -1,13 +1,4 @@
-const { Pool } = require('pg');
 const pool = require('../config/db');
-
-// const pool = new Pool({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "club_registration",
-//   password: "shyam",
-//   port: 5432,
-// });
 
 console.log("Pool object:", pool);
 console.log("Postgres pool object in model:", typeof pool?.query);
@@ -17,7 +8,6 @@ const getStudentProfile = async (studentId) => {
     throw new Error("Missing required parameter: studentId");
   }
   try {
-    // Fetch student details
     const userQuery = `
       SELECT user_id, name, email, dept, class
       FROM public."Users"
@@ -41,7 +31,6 @@ const getStudentProfile = async (studentId) => {
       throw new Error("Student not found");
     }
 
-    // Fetch club memberships
     const clubsQuery = `
       SELECT 
         c.club_id,
@@ -66,7 +55,11 @@ const getStudentProfile = async (studentId) => {
     }
 
     const profile = {
-      ...userResult.rows[0],
+      user_id: userResult.rows[0].user_id,
+      name: userResult.rows[0].name ?? 'N/A',
+      email: userResult.rows[0].email ?? 'N/A',
+      dept: userResult.rows[0].dept ?? 'N/A',
+      class: userResult.rows[0].class ?? 'N/A',
       clubs: clubsResult.rows,
     };
     console.log("getStudentProfile result:", profile);

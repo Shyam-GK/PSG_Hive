@@ -5,6 +5,7 @@ const {
   getEventAttendance,
   getUserAttendance,
 } = require("../controllers/attcontroller");
+const authenticate = require("../middleware/authMiddleware"); // Add this
 
 console.log("Imported attendanceController:", {
   markAttendance,
@@ -17,8 +18,8 @@ if (!markAttendance || !getEventAttendance || !getUserAttendance) {
   throw new Error("Missing required methods from attendanceController");
 }
 
-router.post("/mark", markAttendance);
-router.get("/event/:eventId", getEventAttendance);
-router.get("/user/:studentId", getUserAttendance);
+router.post("/mark", authenticate, markAttendance);
+router.get("/event/:eventId", authenticate, getEventAttendance);
+router.get("/user/:studentId", authenticate, getUserAttendance);
 
 module.exports = router;

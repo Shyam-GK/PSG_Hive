@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
-const pool = require('../config/db');
+const pool = require("../config/db");
 const {
   findUserByEmail,
   findAdminByEmail,
@@ -14,12 +14,17 @@ const {
 
 const sendEmail = async (to, otp) => {
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      throw new Error("Email credentials are not defined in environment variables");
+    }
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      secure: process.env.NODE_ENV === "production",
     });
 
     const mailOptions = {
@@ -39,28 +44,35 @@ const sendEmail = async (to, otp) => {
 
 const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const email = username;
+    const { username, email, password } = req.body;
+    const userEmail = email || username;
 
-    if (!email || !password) {
+    if (!userEmail || !password) {
+      console.log("Missing email/username or password:", { userEmail, password });
       return res
         .status(400)
         .json({ success: false, message: "Email and password are required" });
     }
 
-    let user = await findUserByEmail(email);
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not defined");
+      return res.status(500).json({ success: false, message: "Server configuration error" });
+    }
+
+    let user = await findUserByEmail(userEmail);
     let role;
 
     if (user) {
       role = user.role;
-      console.log('User found in Users table:', user.email, 'Role:', role);
+      console.log("User found in Users table:", user.email, "Role:", role);
     } else {
-      user = await findAdminByEmail(email);
+      user = await findAdminByEmail(userEmail);
       role = "admin";
-      console.log('User found in Admin table:', user.email, 'Role:', role);
+      console.log("User found in Admin table:", user.email, "Role:", role);
     }
 
     if (!user) {
+      console.log("User not found for email:", userEmail);
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
@@ -68,6 +80,7 @@ const login = async (req, res) => {
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
+      console.log("Invalid credentials for email:", userEmail);
       return res
         .status(401)
         .json({ success: false, message: "Invalid credentials" });
@@ -80,12 +93,12 @@ const login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie('jwt', token, {
+    res.cookie("jwt", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: 'None',
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 3600 * 1000,
-      path: '/',
+      path: "/",
     });
 
     console.log(`JWT Cookie set for user ${id}, role: ${role}`);
@@ -101,31 +114,31 @@ const login = async (req, res) => {
         return res.status(400).json({ success: false, message: "Faculty ID is missing" });
       }
       const clubQuery = 'SELECT club_id, club_name FROM public."Clubs" WHERE faculty_advisor = $1';
-      console.log('Executing club query for facultyId:', facultyId);
+      console.log("Executing club query for facultyId:", facultyId);
       try {
         const { rows } = await pool.query(clubQuery, [facultyId]);
-        console.log('Club query result:', rows);
+        console.log("Club query result:", rows);
         if (rows.length > 0) {
           const club = rows[0];
-          res.cookie('faculty_club', JSON.stringify({
+          res.cookie("faculty_club", JSON.stringify({
             club_id: club.club_id,
             club_name: club.club_name
           }), {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: 'None',
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
             maxAge: 3600 * 1000,
-            path: '/',
+            path: "/",
           });
           console.log(`Faculty club cookie set: club_id=${club.club_id}, club_name=${club.club_name}`);
         } else {
           console.log(`No club found for faculty member: ${facultyId}`);
-          res.cookie('faculty_club', JSON.stringify({ hasClub: false }), {
+          res.cookie("faculty_club", JSON.stringify({ hasClub: false }), {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: 'None',
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
             maxAge: 3600 * 1000,
-            path: '/',
+            path: "/",
           });
         }
       } catch (dbErr) {
@@ -134,7 +147,7 @@ const login = async (req, res) => {
       }
     }
 
-    console.log('Final role being sent:', role);
+    console.log("Final role being sent:", role);
 
     return res.status(200).json({
       success: true,
@@ -155,10 +168,14 @@ const login = async (req, res) => {
 
 const getFacultyClub = async (req, res) => {
   try {
-    console.log('Cookies received in getFacultyClub:', req.cookies);
+    if (req.user.role !== "faculty") {
+      return res.status(403).json({ success: false, message: "Access denied: Faculty role required" });
+    }
+
+    console.log("Cookies received in getFacultyClub:", req.cookies);
     const facultyClubCookie = req.cookies.faculty_club;
     if (!facultyClubCookie) {
-      console.log('No faculty_club cookie found for user');
+      console.log("No faculty_club cookie found for user");
       return res.status(200).json({
         success: true,
         hasClub: false,
@@ -170,7 +187,7 @@ const getFacultyClub = async (req, res) => {
     try {
       clubData = JSON.parse(facultyClubCookie);
     } catch (err) {
-      console.error('Error parsing faculty_club cookie:', err.message, err.stack);
+      console.error("Error parsing faculty_club cookie:", err.message, err.stack);
       return res.status(400).json({ success: false, message: "Invalid faculty club data." });
     }
 
@@ -184,7 +201,7 @@ const getFacultyClub = async (req, res) => {
 
     const { club_id, club_name } = clubData;
     if (!club_id || !club_name) {
-      console.log('Invalid faculty club data:', clubData);
+      console.log("Invalid faculty club data:", clubData);
       return res.status(400).json({ success: false, message: "Invalid faculty club data." });
     }
 
@@ -202,12 +219,19 @@ const getFacultyClub = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie('jwt', { path: '/' });
-    res.clearCookie('faculty_club', { path: '/' });
-    res.clearCookie('isLoggedIn', { path: '/' });
-    res.clearCookie('role', { path: '/' });
-    res.clearCookie('user_id', { path: '/' });
-    console.log('Cookies cleared during logout');
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      path: "/",
+    };
+
+    res.clearCookie("jwt", cookieOptions);
+    res.clearCookie("faculty_club", cookieOptions);
+    res.clearCookie("isLoggedIn", cookieOptions);
+    res.clearCookie("role", cookieOptions);
+    res.clearCookie("user_id", cookieOptions);
+    console.log("Cookies cleared during logout");
     return res.status(200).json({ success: true, message: "Logged out successfully" });
   } catch (error) {
     console.error("Logout error:", error.message, error.stack);
@@ -279,7 +303,7 @@ const verifyOtp = async (req, res) => {
         .json({ success: false, message: "User not found or no OTP generated" });
     }
 
-    if (user.otp !== otp) {
+    if (String(user.otp) !== String(otp)) {
       return res.status(400).json({ success: false, message: "Invalid OTP" });
     }
 
@@ -300,6 +324,13 @@ const resetPassword = async (req, res) => {
         .json({ success: false, message: "Email, OTP, and new password are required" });
     }
 
+    // Basic password strength validation
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Password must be at least 8 characters long" });
+    }
+
     let user = await findUserByEmail(email);
     let role = "user";
 
@@ -316,7 +347,7 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: "OTP already used or expired" });
     }
 
-    if (user.otp !== otp) {
+    if (String(user.otp) !== String(otp)) {
       return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
     }
 
