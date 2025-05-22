@@ -3,10 +3,8 @@ require('dotenv').config();
 
 const redisClient = createClient({
   url: process.env.REDIS_URL,
-  socket: process.env.NODE_ENV === 'production' ? {
-    tls: true,
-    rejectUnauthorized: false,
-  } : undefined,
+  // No TLS — Redis Cloud on Render is using plain TCP on port 17580
+  // DO NOT set `socket.tls` here
 });
 
 redisClient.on('error', (err) => console.error('Redis Client Error', err));
