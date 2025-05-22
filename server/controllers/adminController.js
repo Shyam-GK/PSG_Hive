@@ -91,11 +91,11 @@ const addFaculty = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const insertQuery = `
-      INSERT INTO "Users" (user_id, name, email, password, dept, role, class)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO "Users" (user_id, name, email, password, dept, role, class, year_of_joining)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING user_id, name, email, dept, role;
     `;
-    const insertValues = [user_id, name, email, hashedPassword, dept, role, null];
+    const insertValues = [user_id, name, email, hashedPassword, dept, role, null, null];
     const result = await pool.query(insertQuery, insertValues);
 
     res.status(201).json({ success: true, message: "Faculty added successfully", faculty: result.rows[0] });
@@ -122,7 +122,7 @@ const uploadUsers = async (req, res) => {
     const successfulUsers = [];
 
     for (const user of users) {
-      const { user_id, name, email, password, dept, class: userClass, role, passout_year } = user;
+      const { user_id, name, email, password, dept, class: userClass, role, year_of_joining } = user;
 
       if (!user_id || !name || !email || !password || !dept) {
         failedUsers.push({ user_id, error: "Missing required fields" });
@@ -141,7 +141,7 @@ const uploadUsers = async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
       const insertQuery = `
-        INSERT INTO "Users" (user_id, name, email, password, dept, role, class, passout_year)
+        INSERT INTO "Users" (user_id, name, email, password, dept, role, class, year_of_joining)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING user_id;
       `;
@@ -153,7 +153,7 @@ const uploadUsers = async (req, res) => {
         dept,
         role || "student",
         userClass || null,
-        passout_year || null,
+        year_of_joining || null,
       ];
 
       try {
@@ -375,49 +375,49 @@ const getUsers = async (req, res) => {
   }
 };
 
-const getPassoutYears = async (req, res) => {
+const getJoiningYears = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
       return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
     const query = `
-      SELECT DISTINCT passout_year
+      SELECT DISTINCT year_of_joining
       FROM "Users"
-      WHERE passout_year IS NOT NULL AND role = 'student'
-      ORDER BY passout_year;
+      WHERE year_of_joining IS NOT NULL AND role = 'student'
+      ORDER BY year_of_joining;
     `;
     const result = await pool.query(query);
-    const passoutYears = result.rows.map(row => row.passout_year);
-    res.status(200).json({ success: true, data: passoutYears });
+    const joiningYears = result.rows.map(row => row.year_of_joining);
+    res.status(200).json({ success: true, data: joiningYears });
   } catch (err) {
-    console.error("Error fetching passout years:", err.message);
+    console.error("Error fetching joining years:", err.message);
     res.status(500).json({ success: false, message: "Internal server error", details: err.message });
   }
 };
 
 const updateRegistration = async (req, res) => {
-  const { passout_year, is_open } = req.body;
+  const { year_of_joining, is_open } = req.body;
 
   try {
     if (req.user.role !== "admin") {
       return res.status(403).json({ success: false, message: "Access denied: Admin role required" });
     }
 
-    if (!passout_year || typeof is_open !== 'boolean') {
-      return res.status(400).json({ success: false, message: "Passout year and is_open (boolean) are required" });
+    if (!year_of_joining || typeof is_open !== 'boolean') {
+      return res.status(400).json({ success: false, message: "Year of joining and is_open (boolean) are required" });
     }
 
     const updateUsersQuery = `
       UPDATE "Users"
       SET can_select_clubs = $1
-      WHERE role = 'student' AND passout_year = $2;
+      WHERE role = 'student' AND year_of_joining = $2;
     `;
-    await pool.query(updateUsersQuery, [is_open, passout_year]);
+    await pool.query(updateUsersQuery, [is_open, year_of_joining]);
 
     res.status(200).json({ 
       success: true, 
-      message: `Registration ${is_open ? 'opened' : 'closed'} for passout year ${passout_year}` 
+      message: `Registration ${is_open ? 'opened' : 'closed'} for joining year ${year_of_joining}` 
     });
   } catch (err) {
     console.error("Error updating registration:", err.message);
@@ -436,6 +436,6 @@ module.exports = {
   getUsersAndAllotments,
   updateClubAdvisorAndPoC,
   getUsers,
-  getPassoutYears,
+  getJoiningYears,
   updateRegistration,
 };

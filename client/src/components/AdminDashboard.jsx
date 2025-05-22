@@ -22,8 +22,8 @@ const AdminDashboard = () => {
   const [showUploadUsers, setShowUploadUsers] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const [uploadResult, setUploadResult] = useState(null);
-  const [passoutYears, setPassoutYears] = useState([]);
-  const [selectedPassoutYear, setSelectedPassoutYear] = useState("");
+  const [joiningYears, setJoiningYears] = useState([]);
+  const [selectedJoiningYear, setSelectedJoiningYear] = useState("");
 
   const currentYear = new Date().getFullYear();
 
@@ -44,7 +44,7 @@ const AdminDashboard = () => {
     setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/admin/club-status`, { withCredentials: true });
-      console.log("Club status response:", response.data); // Debug response
+      console.log("Club status response:", response.data);
       setClubStatus(Array.isArray(response.data.data) ? response.data.data : []);
       setLoading(false);
     } catch (err) {
@@ -55,22 +55,22 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchPassoutYears = async () => {
+  const fetchJoiningYears = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/admin/passout-years`, { withCredentials: true });
-      console.log("Passout years response:", response.data);
-      setPassoutYears(Array.isArray(response.data.data) ? response.data.data : response.data);
+      const response = await axios.get(`${API_BASE_URL}/admin/joining-years`, { withCredentials: true });
+      console.log("Joining years response:", response.data);
+      setJoiningYears(Array.isArray(response.data.data) ? response.data.data : response.data);
     } catch (err) {
-      console.error("Error fetching passout years:", err.response?.data || err.message);
-      setError("Failed to load passout years.");
-      setPassoutYears([]);
+      console.error("Error fetching joining years:", err.response?.data || err.message);
+      setError("Failed to load joining years.");
+      setJoiningYears([]);
     }
   };
 
   useEffect(() => {
     fetchClubStatus();
     fetchUsers();
-    fetchPassoutYears();
+    fetchJoiningYears();
   }, []);
 
   const handleVacancyChange = (clubId, value) => {
@@ -215,18 +215,18 @@ const AdminDashboard = () => {
   };
 
   const handleUpdateRegistration = async (isOpen) => {
-    if (!selectedPassoutYear) {
-      alert("Please select a passout year.");
+    if (!selectedJoiningYear) {
+      alert("Please select a joining year.");
       return;
     }
 
     try {
       await axios.post(
         `${API_BASE_URL}/admin/update-registration`,
-        { passout_year: parseInt(selectedPassoutYear), is_open: isOpen },
+        { year_of_joining: parseInt(selectedJoiningYear), is_open: isOpen },
         { withCredentials: true }
       );
-      alert(`Registration ${isOpen ? "opened" : "closed"} for passout year ${selectedPassoutYear}!`);
+      alert(`Registration ${isOpen ? "opened" : "closed"} for joining year ${selectedJoiningYear}!`);
     } catch (err) {
       console.error("Error updating registration:", err.response?.data || err.message);
       alert(`Failed to update registration: ${err.response?.data?.message || err.message}`);
@@ -421,7 +421,7 @@ const AdminDashboard = () => {
                   className="file-input"
                 />
                 <p className="upload-instruction">
-                  File must contain: user_id, name, email, password, dept, class (optional), role (optional), passout_year (optional).
+                  File must contain: user_id, name, email, password, dept, class (optional), role (optional), year_of_joining.
                 </p>
                 {uploadError && <p className="error-message">{uploadError}</p>}
                 {uploadResult && (
@@ -450,20 +450,19 @@ const AdminDashboard = () => {
             <h2 className="section-title">Enable Registration</h2>
             <div className="registration-control-form">
               <select
-                value={selectedPassoutYear}
-                onChange={(e) => setSelectedPassoutYear(e.target.value)}
+                value={selectedJoiningYear}
+                onChange={(e) => setSelectedJoiningYear(e.target.value)}
                 className="passout-year-select"
               >
-                <option value="">Select Passout Year</option>
-                {passoutYears.map((year) => (
+                <option value="">Select Year of Joining</option>
+                {joiningYears.map((year) => (
                   <option key={year} value={year}>
-                    {year} (
+                    {year}{" "}
                     {year === currentYear
-                      ? "Present"
+                      ? "(Current Batch)"
                       : year > currentYear
-                      ? `Year ${year - currentYear}`
-                      : "Past"}
-                    )
+                      ? `(Incoming Batch ${year})`
+                      : `(Year ${currentYear - year})`}
                   </option>
                 ))}
               </select>

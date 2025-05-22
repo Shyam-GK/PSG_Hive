@@ -17,7 +17,6 @@ body, html {
   max-width: 1200px;
   margin: 0 auto;
   padding: 30px 20px;
-  opacity: 1 !important; /* Ensure container is visible */
 }
 
 /* Header */
@@ -60,6 +59,8 @@ body, html {
 .form-title {
   font-size: 2.2rem;
   font-weight: 800;
+  text-align: center;
+  margin: 20px 0;
 }
 
 /* Input Container */
@@ -187,16 +188,14 @@ body, html {
 .club-list {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
-  padding: 25px;
+  padding: 30px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
-  opacity: 1 !important; /* Ensure section is visible */
-  min-height: 300px; /* Prevent collapse */
 }
 
 .section-title {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
   font-size: 1.8rem;
   font-weight: 700;
   color: #357abd;
@@ -206,63 +205,54 @@ body, html {
 
 .club-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  height: 1000px; /* Ensure grid has height */
-  opacity: 1 !important; /* Force visibility */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
 }
 
 .club-card1 {
-  background: linear-gradient(145deg, #ffffff, #e8ecef);
+  background: #ffffff;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  overflow: visible; /* Prevent clipping */
-  height: 200px; /* Ensure card has height */
-  opacity: 1 !important; /* Force visibility */
-  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+  border: 1px solid #e5e7eb;
 }
 
-.club-card:hover {
-  transform: translateY(-0.05px);
-  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.15);
+.club-card1:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .club-name {
   font-size: 1.3rem;
   font-weight: 600;
   color: #357abd;
-  margin-bottom: 8px;
-  opacity: 1 !important; /* Force visibility */
-  position: relative;
-  z-index: 1; /* Ensure above any pseudo-elements */
+  margin-bottom: 10px;
 }
 
 .seats-available {
   font-size: 0.95rem;
   color: #4b5563;
-  margin-bottom: 12px;
-  opacity: 1 !important; /* Force visibility */
-  position: relative;
-  z-index: 1;
+  margin-bottom: 15px;
 }
 
 .register-button {
-  width: 100%;
+  width: auto;
+  max-width: 150px;
+  align-self: center;
   background: linear-gradient(145deg, #357abd, #0d4ad9);
-  color: white !important; /* Force text color */
-  padding: 10px;
-  border: 1px solid #357abd; /* Debugging border */
+  color: white;
+  padding: 10px 20px;
+  border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
   transition: background 0.3s ease, transform 0.3s ease;
-  opacity: 1 !important; /* Force visibility */
-  position: relative;
-  z-index: 1;
 }
 
 .register-button:hover:not(:disabled) {
@@ -456,9 +446,14 @@ body, html {
     font-size: 1.5rem;
   }
 
-  .club-card {
+  .club-cards {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .club-card1 {
     padding: 15px;
-    min-height: 120px; /* Adjust for smaller screens */
+    min-height: 160px;
   }
 
   .club-name {
@@ -489,11 +484,26 @@ body, html {
 
   .club-cards {
     grid-template-columns: 1fr;
-    min-height: 150px; /* Adjust for smaller screens */
+    gap: 15px;
   }
 
-  .club-card {
-    min-height: 100px; /* Adjust for smaller screens */
+  .club-card1 {
+    min-height: 140px;
+    padding: 15px;
+  }
+
+  .club-name {
+    font-size: 1.1rem;
+  }
+
+  .seats-available {
+    font-size: 0.9rem;
+  }
+
+  .register-button {
+    max-width: 120px;
+    padding: 8px 15px;
+    font-size: 0.95rem;
   }
 
   .dialog-content {

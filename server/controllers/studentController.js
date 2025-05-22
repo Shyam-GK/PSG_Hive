@@ -100,7 +100,7 @@ const getRegistrationStatus = async (req, res) => {
       return res.status(403).json({ error: "Forbidden: Student role required" });
     }
 
-    const userQuery = 'SELECT user_id, passout_year, can_select_clubs FROM "Users" WHERE user_id = $1 AND role = \'student\'';
+    const userQuery = 'SELECT user_id, year_of_joining, can_select_clubs FROM "Users" WHERE user_id = $1 AND role = \'student\'';
     const userResult = await pool.query(userQuery, [user_id]);
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
@@ -115,8 +115,8 @@ const getRegistrationStatus = async (req, res) => {
     res.status(200).json({
       hasRegistered,
       canSelectClubs: user.can_select_clubs ?? true, // Fallback if column missing
-      userPassoutYear: user.passout_year,
-      canRegister: (user.can_select_clubs ?? true) && !hasRegistered,
+      userPassoutYear: user.year_of_joining,
+      canRegister: (user.can_select_clubs ?? true),
     });
   } catch (err) {
     console.error("Error fetching registration status:", err.message, err.stack);

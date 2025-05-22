@@ -20,7 +20,7 @@ router.get("/users-not-registered", authenticate, adminController.getUsersNotReg
 router.get("/users-allotments", authenticate, adminController.getUsersAndAllotments);
 router.put("/update-advisor-poc/:club_id", authenticate, adminController.updateClubAdvisorAndPoC);
 router.get("/users", authenticate, adminController.getUsers);
-router.get("/passout-years", authenticate, adminController.getPassoutYears);
+router.get("/joining-years", authenticate, adminController.getJoiningYears);
 router.post("/update-registration", authenticate, adminController.updateRegistration);
 
 module.exports = router;
