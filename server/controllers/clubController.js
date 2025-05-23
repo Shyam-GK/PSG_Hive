@@ -33,19 +33,23 @@ const getClubDetails = async (req, res) => {
     const { clubId } = req.params;
     const query = `
       SELECT 
-        club_id, 
-        club_name,
-        description,
-        max_vacancy,
-        min_allotment,
-        faculty_advisor,
-        poc,
-        poc_phone,
-        curr_allotment
-      FROM public."Clubs"
-      WHERE club_id = $1;
+        c.club_id, 
+        c.club_name,
+        c.description,
+        c.max_vacancy,
+        c.min_allotment,
+        c.faculty_advisor,
+        u.name AS faculty_advisor_name,
+        c.poc,
+        c.poc_phone,
+        c.curr_allotment
+      FROM public."Clubs" c
+      LEFT JOIN public."Users" u
+      ON UPPER(c.faculty_advisor) = UPPER(u.user_id)
+      WHERE c.club_id = $1;
     `;
-    const result = await pool.query(query, [clubId]); 
+    const result = await pool.query(query, [clubId]);
+    console.log(`Query result for clubId ${clubId}:`, result.rows); // Log for debugging
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Club not found" });

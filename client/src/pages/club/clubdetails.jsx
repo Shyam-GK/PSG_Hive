@@ -109,7 +109,9 @@ const ClubDetail = () => {
             <div className="clubdetail-club-details">
               <div className="clubdetail-detail-item">
                 <span className="clubdetail-detail-label">Faculty Advisor:</span>
-                <span className="clubdetail-detail-value">{club.faculty_advisor || 'N/A'}</span>
+                <span className="clubdetail-detail-value">
+                  {club.faculty_advisor ? `${club.faculty_advisor} (${club.faculty_advisor_name || 'N/A'})` : 'N/A'}
+                </span>
               </div>
               <div className="clubdetail-detail-item">
                 <span className="clubdetail-detail-label">Contact:</span>
