@@ -205,6 +205,14 @@ const StudentProfile = () => {
               <span className="detail-label">Class:</span>
               <span className="detail-value">{profile?.class ?? 'N/A'}</span>
             </div>
+            <div className="detail-row">
+              <span className="detail-label">Gender:</span>
+              <span className="detail-value">{profile?.gender ?? 'N/A'}</span>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">Residency Status:</span>
+              <span className="detail-value">{profile?.residency_status ?? 'N/A'}</span>
+            </div>
           </div>
 
           <div className="detail-card slide-in">

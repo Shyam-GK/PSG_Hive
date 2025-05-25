@@ -400,11 +400,26 @@ const FacultyDashboard = () => {
         return str;
       };
 
-      const headers = ['Student ID', 'Student Name'];
-      const rows = students.map((student) => [
-        escapeCSV(student.student_id),
-        escapeCSV(student.name || 'Unknown'),
-      ]);
+      // Updated headers to include all fields from the backend query
+    const headers = [
+      'Student ID',
+      'Name',
+      'Email',
+      'Department',
+      'Class',
+      'Gender',
+      'Residency Status'
+    ];
+    // Updated rows to include all fields
+    const rows = students.map((student) => [
+      escapeCSV(student.student_id),
+      escapeCSV(student.name || 'Not Specified'),
+      escapeCSV(student.email || 'Not Specified'),
+      escapeCSV(student.dept || 'Not Specified'),
+      escapeCSV(student.class || 'Not Specified'),
+      escapeCSV(student.gender || 'Not Specified'),
+      escapeCSV(student.residency_status || 'Not Specified')
+    ]);
       const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
 
       const clubName = club ? club.club_name.replace(/[^a-zA-Z0-9]/g, '_') : 'club';

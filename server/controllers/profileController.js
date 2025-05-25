@@ -34,6 +34,8 @@ const getStudentProfile = async (req, res) => {
       email: profile.email ?? 'N/A',
       dept: profile.dept ?? 'N/A',
       class: profile.class ?? 'N/A',
+      gender: profile.gender ?? 'N/A',
+      residency_status: profile.residency_status ?? 'N/A',
       clubs: Array.isArray(profile.clubs) ? profile.clubs : [],
     };
     console.log("Sending profile response:", normalizedProfile);

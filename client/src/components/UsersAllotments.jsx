@@ -13,12 +13,16 @@ const UsersAllotments = () => {
     status: "",
     alloted_at_start: "",
     alloted_at_end: "",
+    gender: "",
+    residency_status: "",
   });
   const [uniqueValues, setUniqueValues] = useState({
     dept: [],
     club_name: [],
     type: [],
     status: [],
+    gender: [],
+    residency_status: [],
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -30,7 +34,7 @@ const UsersAllotments = () => {
       const response = await axios.get(`${API_BASE_URL}/admin/users-allotments`, {
         withCredentials: true,
       });
-      console.log("Users allotments response:", response.data); // Debug response
+      console.log("Users allotments response:", response.data);
       const data = response.data.data || [];
 
       if (!Array.isArray(data)) {
@@ -44,12 +48,16 @@ const UsersAllotments = () => {
       const uniqueClubNames = [...new Set(data.map((item) => item.club_name))].sort();
       const uniqueTypes = [...new Set(data.map((item) => item.type))].sort();
       const uniqueStatuses = [...new Set(data.map((item) => item.status))].sort();
+      const uniqueGenders = [...new Set(data.map((item) => item.gender))].sort();
+      const uniqueResidencyStatuses = [...new Set(data.map((item) => item.residency_status))].sort();
 
       setUniqueValues({
         dept: uniqueDepts,
         club_name: uniqueClubNames,
         type: uniqueTypes,
         status: uniqueStatuses,
+        gender: uniqueGenders,
+        residency_status: uniqueResidencyStatuses,
       });
       setLoading(false);
     } catch (err) {
@@ -85,6 +93,8 @@ const UsersAllotments = () => {
         (filterInputs.club_name ? allotment.club_name === filterInputs.club_name : true) &&
         (filterInputs.type ? allotment.type === filterInputs.type : true) &&
         (filterInputs.status ? allotment.status === filterInputs.status : true) &&
+        (filterInputs.gender ? allotment.gender === filterInputs.gender : true) &&
+        (filterInputs.residency_status ? allotment.residency_status === filterInputs.residency_status : true) &&
         (startDate ? allotedAt >= startDate : true) &&
         (endDate ? allotedAt <= endDate : true)
       );
@@ -93,10 +103,10 @@ const UsersAllotments = () => {
   };
 
   const downloadCSV = () => {
-    const headers = ["User ID,Name,Department,Club,Type,Status,Allotted At"];
+    const headers = ["User ID,Name,Department,Gender,Residency Status,Club,Type,Status,Allotted At"];
     const rows = filteredData.map(
       (allotment) =>
-        `${allotment.user_id},${allotment.name},${allotment.dept},${allotment.club_name},${allotment.type},${allotment.status},${new Date(allotment.alloted_at).toLocaleString()}`
+        `${allotment.user_id},${allotment.name},${allotment.dept},${allotment.gender},${allotment.residency_status},${allotment.club_name},${allotment.type},${allotment.status},${new Date(allotment.alloted_at).toLocaleString()}`
     );
     const csvContent = [...headers, ...rows].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
@@ -194,6 +204,34 @@ const UsersAllotments = () => {
               </select>
             </div>
             <div className="range-filter">
+              <label>Gender:</label>
+              <select
+                name="gender"
+                value={filterInputs.gender}
+                onChange={handleFilterInputChange}
+                className="filter-dropdown"
+              >
+                <option value="">All Genders</option>
+                {uniqueValues.gender.map((val) => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </div>
+            <div className="range-filter">
+              <label>Residency Status:</label>
+              <select
+                name="residency_status"
+                value={filterInputs.residency_status}
+                onChange={handleFilterInputChange}
+                className="filter-dropdown"
+              >
+                <option value="">All Residency Statuses</option>
+                {uniqueValues.residency_status.map((val) => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </div>
+            <div className="range-filter">
               <label>Start Date:</label>
               <input
                 type="date"
@@ -244,6 +282,8 @@ const UsersAllotments = () => {
                   <th>User ID</th>
                   <th>Name</th>
                   <th>Department</th>
+                  <th>Gender</th>
+                  <th>Residency Status</th>
                   <th>Club</th>
                   <th>Type</th>
                   <th>Status</th>
@@ -259,6 +299,8 @@ const UsersAllotments = () => {
                     <td>{allotment.user_id}</td>
                     <td>{allotment.name}</td>
                     <td>{allotment.dept}</td>
+                    <td>{allotment.gender}</td>
+                    <td>{allotment.residency_status}</td>
                     <td>{allotment.club_name}</td>
                     <td>{allotment.type}</td>
                     <td>{allotment.status}</td>

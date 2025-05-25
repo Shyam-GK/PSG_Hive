@@ -9,10 +9,14 @@ const UsersNotRegistered = () => {
   const [filterInputs, setFilterInputs] = useState({
     dept: "",
     class: "",
+    gender: "",
+    residency_status: "",
   });
   const [uniqueValues, setUniqueValues] = useState({
     dept: [],
     class: [],
+    gender: [],
+    residency_status: [],
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -24,7 +28,7 @@ const UsersNotRegistered = () => {
       const response = await axios.get(`${API_BASE_URL}/admin/users-not-registered`, {
         withCredentials: true,
       });
-      console.log("Users not registered response:", response.data); // Debug response
+      console.log("Users not registered response:", response.data);
       const data = response.data.data || [];
 
       if (!Array.isArray(data)) {
@@ -36,10 +40,14 @@ const UsersNotRegistered = () => {
 
       const uniqueDepts = [...new Set(data.map((item) => item.dept))].sort();
       const uniqueClasses = [...new Set(data.map((item) => item.class || "N/A"))].sort();
+      const uniqueGenders = [...new Set(data.map((item) => item.gender))].sort();
+      const uniqueResidencyStatuses = [...new Set(data.map((item) => item.residency_status))].sort();
 
       setUniqueValues({
         dept: uniqueDepts,
         class: uniqueClasses,
+        gender: uniqueGenders,
+        residency_status: uniqueResidencyStatuses,
       });
       setLoading(false);
     } catch (err) {
@@ -64,16 +72,18 @@ const UsersNotRegistered = () => {
     const filtered = usersNotRegistered.filter((user) => {
       return (
         (filterInputs.dept ? user.dept === filterInputs.dept : true) &&
-        (filterInputs.class ? (user.class || "N/A") === filterInputs.class : true)
+        (filterInputs.class ? (user.class || "N/A") === filterInputs.class : true) &&
+        (filterInputs.gender ? user.gender === filterInputs.gender : true) &&
+        (filterInputs.residency_status ? user.residency_status === filterInputs.residency_status : true)
       );
     });
     setFilteredData(filtered);
   };
 
   const downloadCSV = () => {
-    const headers = ["User ID,Name,Department,Class"];
+    const headers = ["User ID,Name,Department,Class,Gender,Residency Status"];
     const rows = filteredData.map(
-      (user) => `${user.user_id},${user.name},${user.dept},${user.class || "N/A"}`
+      (user) => `${user.user_id},${user.name},${user.dept},${user.class || "N/A"},${user.gender},${user.residency_status}`
     );
     const csvContent = [...headers, ...rows].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
@@ -142,6 +152,34 @@ const UsersNotRegistered = () => {
                 ))}
               </select>
             </div>
+            <div className="range-filter">
+              <label>Gender:</label>
+              <select
+                name="gender"
+                value={filterInputs.gender}
+                onChange={handleFilterInputChange}
+                className="filter-dropdown"
+              >
+                <option value="">All Genders</option>
+                {uniqueValues.gender.map((val) => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </div>
+            <div className="range-filter">
+              <label>Residency Status:</label>
+              <select
+                name="residency_status"
+                value={filterInputs.residency_status}
+                onChange={handleFilterInputChange}
+                className="filter-dropdown"
+              >
+                <option value="">All Residency Statuses</option>
+                {uniqueValues.residency_status.map((val) => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </div>
             <button className="apply-filters-button" onClick={applyFilters}>
               Apply Filters
             </button>
@@ -174,6 +212,8 @@ const UsersNotRegistered = () => {
                   <th>Name</th>
                   <th>Department</th>
                   <th>Class</th>
+                  <th>Gender</th>
+                  <th>Residency Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,6 +223,8 @@ const UsersNotRegistered = () => {
                     <td>{user.name}</td>
                     <td>{user.dept}</td>
                     <td>{user.class || "N/A"}</td>
+                    <td>{user.gender}</td>
+                    <td>{user.residency_status}</td>
                   </tr>
                 ))}
               </tbody>

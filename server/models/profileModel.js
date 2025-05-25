@@ -13,7 +13,7 @@ const getStudentProfile = async (studentId) => {
   }
   try {
     const userQuery = `
-      SELECT user_id, name, email, dept, class
+      SELECT user_id, name, email, dept, class, gender, residency_status
       FROM public."Users"
       WHERE user_id ILIKE $1;
     `;
@@ -64,6 +64,8 @@ const getStudentProfile = async (studentId) => {
       email: userResult.rows[0].email ?? 'N/A',
       dept: userResult.rows[0].dept ?? 'N/A',
       class: userResult.rows[0].class ?? 'N/A',
+      gender: userResult.rows[0].gender ?? 'N/A',
+      residency_status: userResult.rows[0].residency_status ?? 'N/A',
       clubs: clubsResult.rows.map(club => ({
         club_id: club.club_id ?? 'N/A',
         club_name: club.club_name ?? 'N/A',

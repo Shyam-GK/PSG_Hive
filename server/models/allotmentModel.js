@@ -21,7 +21,7 @@ const getClubStudents = async (clubId) => {
       throw new Error("Invalid or missing club_id");
     }
     const query = `
-      SELECT a.student_id, u.name
+      SELECT a.student_id, u.name , u.email, u.dept, u.class, u.gender, u.residency_status
       FROM public."Allotment" a
       JOIN public."Users" u ON a.student_id = u.user_id
       WHERE a.club_id = $1

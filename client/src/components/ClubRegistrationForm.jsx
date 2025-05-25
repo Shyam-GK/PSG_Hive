@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../styles/ClubRegistrationForm.css';
 import API_BASE_URL from "../api";
 
-const maxClubsAllowed = 3;
+const maxClubsAllowed = 1;
 
 const ClubRegistrationForm = () => {
   const navigate = useNavigate();

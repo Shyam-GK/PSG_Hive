@@ -117,15 +117,28 @@ const uploadUsers = async (req, res) => {
       return res.status(400).json({ success: false, message: "No user data provided" });
     }
 
+    const validGenders = ['Male', 'Female'];
+    const validResidencyStatuses = ['Hosteller', 'Dayscholar'];
     const saltRounds = 10;
     const failedUsers = [];
     const successfulUsers = [];
 
     for (const user of users) {
-      const { user_id, name, email, password, dept, class: userClass, role, year_of_joining } = user;
+      const { user_id, name, email, password, dept, gender, residency_status, class: userClass, role, year_of_joining } = user;
 
-      if (!user_id || !name || !email || !password || !dept) {
+      // Validate required fields
+      if (!user_id || !name || !email || !password || !dept || !gender || !residency_status) {
         failedUsers.push({ user_id, error: "Missing required fields" });
+        continue;
+      }
+
+      // Validate gender and residency_status
+      if (!validGenders.includes(gender)) {
+        failedUsers.push({ user_id, error: "Invalid gender. Must be 'Male' or 'Female'" });
+        continue;
+      }
+      if (!validResidencyStatuses.includes(residency_status)) {
+        failedUsers.push({ user_id, error: "Invalid residency_status. Must be 'Hosteller' or 'Dayscholar'" });
         continue;
       }
 
@@ -141,8 +154,8 @@ const uploadUsers = async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
       const insertQuery = `
-        INSERT INTO "Users" (user_id, name, email, password, dept, role, class, year_of_joining)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO "Users" (user_id, name, email, password, dept, gender, residency_status, role, class, year_of_joining)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING user_id;
       `;
       const insertValues = [
@@ -151,6 +164,8 @@ const uploadUsers = async (req, res) => {
         email,
         hashedPassword,
         dept,
+        gender,
+        residency_status,
         role || "student",
         userClass || null,
         year_of_joining || null,
@@ -271,10 +286,12 @@ const getUsersNotRegistered = async (req, res) => {
     }
 
     const result = await pool.query(`
-      SELECT u.user_id, u.name, u.dept, u.class
+      SELECT u.user_id, u.name, u.dept, u.class, u.gender, u.residency_status
       FROM "Users" u
       LEFT JOIN "Registrations" r ON u.user_id = r.student_id
       WHERE r.reg_id IS NULL
+      AND u.role = 'student'
+      AND u.can_select_clubs = true
       ORDER BY u.dept, u.user_id
     `);
     res.status(200).json({ success: true, data: result.rows });
@@ -295,6 +312,8 @@ const getUsersAndAllotments = async (req, res) => {
         u.user_id, 
         u.name, 
         u.dept, 
+        u.gender, 
+        u.residency_status, 
         c.club_id, 
         c.club_name, 
         a.type, 

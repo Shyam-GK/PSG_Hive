@@ -185,13 +185,25 @@ const AdminDashboard = () => {
       skipEmptyLines: true,
       complete: async (result) => {
         const parsedData = result.data;
-        const requiredFields = ["user_id", "name", "email", "password", "dept"];
+        const requiredFields = ["user_id", "name", "email", "password", "dept", "gender", "residency_status"];
         const missingFields = parsedData.some((row) =>
           requiredFields.some((field) => !row[field] || row[field].trim() === "")
         );
 
         if (missingFields) {
-          setUploadError("CSV/Excel file must contain all required fields: user_id, name, email, password, dept.");
+          setUploadError("CSV/Excel file must contain all required fields: user_id, name, email, password, dept, gender, residency_status.");
+          return;
+        }
+
+        // Validate gender and residency_status values
+        const validGenders = ["Male", "Female"];
+        const validResidencyStatuses = ["Hosteller", "Dayscholar"];
+        const invalidData = parsedData.some((row) =>
+          !validGenders.includes(row.gender) || !validResidencyStatuses.includes(row.residency_status)
+        );
+
+        if (invalidData) {
+          setUploadError("Invalid values detected. Gender must be 'Male' or 'Female', and residency_status must be 'Hosteller' or 'Dayscholar'.");
           return;
         }
 
@@ -421,7 +433,7 @@ const AdminDashboard = () => {
                   className="file-input"
                 />
                 <p className="upload-instruction">
-                  File must contain: user_id, name, email, password, dept, class (optional), role (optional), year_of_joining.
+                  File must contain: user_id, name, email, password, dept, gender (Male/Female), residency_status (Hosteller/Dayscholar), class (optional), role (optional), year_of_joining.
                 </p>
                 {uploadError && <p className="error-message">{uploadError}</p>}
                 {uploadResult && (
