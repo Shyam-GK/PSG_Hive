@@ -127,8 +127,8 @@ const getRegistrationStatus = async (req, res) => {
 // Submit preferences
 const submitPreferences = async (req, res) => {
   const { preferences } = req.body;
-  const maxClubsAllowed = 3;
-  
+  const maxClubsAllowed = 1; // Changed from 3 to 1
+
   try {
     const student_id = req.user.id;
     console.log("Submitting preferences for student:", student_id, "Preferences:", preferences);
@@ -138,23 +138,23 @@ const submitPreferences = async (req, res) => {
 
     // Input Validation
     if (!Array.isArray(preferences) || preferences.length !== maxClubsAllowed) {
-      return res.status(400).json({ error: `Exactly ${maxClubsAllowed} club preferences are required` });
+      return res.status(400).json({ error: `Exactly ${maxClubsAllowed} club preference is required` });
     }
 
     // Check User Status
     const userResult = await pool.query(
-      'SELECT can_select_clubs FROM "Users" WHERE user_id = $1 AND role = \'student\'', 
+      'SELECT can_select_clubs FROM "Users" WHERE user_id = $1 AND role = \'student\'',
       [student_id]
     );
-    
+
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    const can_select_clubs = userResult.rows[0].can_select_clubs ?? true; // Fallback
+    const can_select_clubs = userResult.rows[0].can_select_clubs ?? true;
     console.log("Can select clubs:", can_select_clubs);
     if (!can_select_clubs) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: "Registration is closed. You cannot modify preferences anymore."
       });
     }
@@ -177,14 +177,14 @@ const submitPreferences = async (req, res) => {
       for (let i = 0; i < preferences.length; i++) {
         const reg_id = generateShortUUID();
         const club_id = preferences[i];
-        const pref_value = i + 1;
+        const pref_value = i + 1; // Will be 1 for single club
 
         // Verify club exists
         const clubCheck = await pool.query(
-          'SELECT club_name FROM "Clubs" WHERE club_id = $1', 
+          'SELECT club_name FROM "Clubs" WHERE club_id = $1',
           [club_id]
         );
-        
+
         if (clubCheck.rowCount === 0) {
           await pool.query('ROLLBACK');
           return res.status(400).json({ error: `Club with ID ${club_id} does not exist` });
@@ -200,12 +200,13 @@ const submitPreferences = async (req, res) => {
           [reg_id, student_id, club_id, pref_value, deadline]
         );
         regIds.push({ reg_id, club_id });
+        break; // Process only one club
       }
 
       // Insert into Allotment table
       for (let i = 0; i < regIds.length; i++) {
         const { reg_id, club_id } = regIds[i];
-        const type = i === 0 ? 'Primary' : 'Associate';
+        const type = i === 0 ? 'Primary' : 'Associate'; // Primary for single club, Associate logic kept
         console.log(`Inserting allotment: reg_id=${reg_id}, club_id=${club_id}, type=${type}`);
         await pool.query(
           `INSERT INTO "Allotment" 
@@ -226,7 +227,7 @@ const submitPreferences = async (req, res) => {
       await pool.query('COMMIT');
       console.log("Preferences and allotments updated successfully for student:", student_id);
       res.status(200).json({ message: "Preferences and allotments updated successfully" });
-      
+
     } catch (err) {
       await pool.query('ROLLBACK');
       console.error("Database error in submitPreferences:", {
@@ -235,16 +236,16 @@ const submitPreferences = async (req, res) => {
         parameters: err.parameters,
         stack: err.stack
       });
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Database operation failed",
         details: err.message
       });
     }
   } catch (err) {
     console.error("Error in submitPreferences:", err.message, err.stack);
-    res.status(500).json({ 
-      error: "Internal server error", 
-      details: err.message 
+    res.status(500).json({
+      error: "Internal server error",
+      details: err.message
     });
   }
 };
