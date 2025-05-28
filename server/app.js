@@ -12,6 +12,43 @@ const app = express();
 //   });
 // }
 
+
+const { Pool } = require('pg');
+
+const pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+});
+
+// Test the database connection
+pool.connect((err, client, release) => {
+    if (err) {
+        console.error('❌ Database connection failed:', err.stack);
+        process.exit(1);
+    } else {
+        console.log('✅ Connected to database');
+        release();
+    }
+});
+
+module.exports = pool;
+
+
+
+// Middleware, routes, etc.
+console.log('Starting server...');
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+}).on('error', (err) => {
+    console.error('❌ Server startup failed:', err);
+    process.exit(1);
+});
+
+
 // Define allowed origins
 const allowedOrigins = [
   "http://localhost:3000", // Development
