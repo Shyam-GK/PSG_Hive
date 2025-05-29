@@ -60,7 +60,7 @@ services:
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=https://suclubs.psgtech.ac.in/api
+      - REACT_APP_API_URL=http://10.1.10.181:3000
 
 volumes:
   pgdata:
