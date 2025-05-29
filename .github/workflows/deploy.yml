@@ -32,7 +32,7 @@ jobs:
           context: ./server
           file: ./server/Dockerfile
           push: true
-          tags: suclub/club-backend:latest
+          tags: shyamgk/club-backend:latest
 
       # Build and push frontend image
       - name: Build and push frontend image
@@ -41,7 +41,7 @@ jobs:
           context: ./client
           file: ./client/Dockerfile
           push: true
-          tags: suclub/club-frontend:latest
+          tags: shyamgk/club-frontend:latest
 
       # Deploy to server via SSH
       - name: Deploy to server
