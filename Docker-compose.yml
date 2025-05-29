@@ -1,8 +1,7 @@
-#version: '3.8'
 services:
   postgres:
     image: postgres:14
-    container_name: postgres-1  # Explicitly set container name
+    container_name: postgres-1
     environment:
       POSTGRES_DB: club_registration
       POSTGRES_USER: postgres
@@ -11,25 +10,35 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:alpine
-    container_name: redis-1  # Explicitly set container name
+    container_name: redis-1
     ports:
       - "6379:6379"
     volumes:
       - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: shyamgk/club-backend:latest
     container_name: backend
     ports:
       - "5000:5000"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       DB_USER: postgres
       DB_HOST: postgres
@@ -44,16 +53,14 @@ services:
       EMAIL_PASS: omcvgcujnhmpunjx
 
   frontend:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+    image: shyamgk/club-frontend:latest
     container_name: frontend
     ports:
       - "3000:80"
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_API_URL=https://suclubs.psgtech.ac.in/api
 
 volumes:
   pgdata:
