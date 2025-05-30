@@ -46,7 +46,6 @@ const loginStudent = async (req, res) => {
       sameSite: "None",
       maxAge: 60 * 60 * 1000,
       path: "/",
-      domain: "suclubs.psgtech.ac.in",
     });
 
     console.log(`JWT cookie set for user ${user.user_id}: jwt=${token}`);

@@ -38,7 +38,6 @@ const loginAdmin = async (req, res) => {
       sameSite: "None",
       maxAge: 3600 * 1000,
       path: "/",
-      domain: "suclubs.psgtech.ac.in",
     });
 
     res.cookie("isLoggedIn", "true", {
@@ -46,14 +45,12 @@ const loginAdmin = async (req, res) => {
       secure: false,
       sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: "suclubs.psgtech.ac.in",
     });
     res.cookie("role", "admin", {
       httpOnly: true,
       secure: false,
       sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: "suclubs.psgtech.ac.in",
     });
 
     res.status(200).json({

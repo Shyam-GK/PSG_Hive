@@ -98,9 +98,7 @@ const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "None",
       maxAge: 3600 * 1000,
-      path: "/",
-      domain: "suclubs.psgtech.ac.in",
-    });
+      path: "/",    });
 
     console.log(`JWT Cookie set for user ${id}, role: ${role}`);
 
@@ -130,7 +128,6 @@ const login = async (req, res) => {
             sameSite: "None",
             maxAge: 3600 * 1000,
             path: "/",
-            domain: "suclubs.psgtech.ac.in",
           });
           console.log(`Faculty club cookie set: club_id=${club.club_id}, club_name=${club.club_name}`);
         } else {
@@ -141,7 +138,6 @@ const login = async (req, res) => {
             sameSite: "None",
             maxAge: 3600 * 1000,
             path: "/",
-            domain: "suclubs.psgtech.ac.in",
           });
         }
       } catch (dbErr) {
