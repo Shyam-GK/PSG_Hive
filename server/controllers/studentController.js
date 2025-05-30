@@ -43,7 +43,7 @@ const loginStudent = async (req, res) => {
     res.cookie("jwt", token, {
       httpOnly: true,
       secure: false,
-      sameSite: "None",
+      sameSite: "Lax",
       maxAge: 60 * 60 * 1000,
       path: "/",
     });
