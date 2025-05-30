@@ -96,7 +96,7 @@ const login = async (req, res) => {
     res.cookie("jwt", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: "None",
       maxAge: 3600 * 1000,
       path: "/",    });
 
@@ -125,7 +125,7 @@ const login = async (req, res) => {
           }), {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "Lax",
+            sameSite: "None",
             maxAge: 3600 * 1000,
             path: "/",
           });
@@ -135,7 +135,7 @@ const login = async (req, res) => {
           res.cookie("faculty_club", JSON.stringify({ hasClub: false }), {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "Lax",
+            sameSite: "None",
             maxAge: 3600 * 1000,
             path: "/",
           });
@@ -221,7 +221,7 @@ const logout = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: "None",
       path: "/",
     };
 

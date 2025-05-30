@@ -35,7 +35,7 @@ const loginAdmin = async (req, res) => {
     res.cookie("jwt", token, {
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: "None",
       maxAge: 3600 * 1000,
       path: "/",
     });
@@ -43,13 +43,13 @@ const loginAdmin = async (req, res) => {
     res.cookie("isLoggedIn", "true", {
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.cookie("role", "admin", {
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
