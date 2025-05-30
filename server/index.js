@@ -14,6 +14,7 @@ const allowedOrigins = [
   "https://psg-hive-shyam-gks-projects.vercel.app",
   "https://psg-hive-git-main-shyam-gks-projects.vercel.app",
   "http://suclubs.psgtech.ac.in",
+   "https://suclubs.psgtech.ac.in",
 ];
 app.options("*", cors());
 app.use(cors({
