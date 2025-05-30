@@ -42,7 +42,7 @@ const loginStudent = async (req, res) => {
     // Set JWT cookie
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 60 * 60 * 1000,
       path: "/",
