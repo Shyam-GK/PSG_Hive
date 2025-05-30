@@ -24,7 +24,7 @@ const sendEmail = async (to, otp) => {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
     });
 
     const mailOptions = {
@@ -95,7 +95,7 @@ const login = async (req, res) => {
 
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "None",
       maxAge: 3600 * 1000,
       path: "/",    });
@@ -124,7 +124,7 @@ const login = async (req, res) => {
             club_name: club.club_name
           }), {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: true,
             sameSite: "None",
             maxAge: 3600 * 1000,
             path: "/",
@@ -134,7 +134,7 @@ const login = async (req, res) => {
           console.log(`No club found for faculty member: ${facultyId}`);
           res.cookie("faculty_club", JSON.stringify({ hasClub: false }), {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: true,
             sameSite: "None",
             maxAge: 3600 * 1000,
             path: "/",
@@ -220,7 +220,7 @@ const logout = async (req, res) => {
   try {
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "None",
       path: "/",
     };

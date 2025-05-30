@@ -36,7 +36,7 @@ const authenticate = (req, res, next) => {
     console.error("Token verification failed:", err.message, err.stack);
     res.clearCookie("jwt", {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "None",
       path: "/",
     });
