@@ -50,7 +50,7 @@ services:
       JWT_SECRET: super_secret_key_123456
       JWT_REFRESH_SECRET: your_jwt_refresh_secret_123456
       EMAIL_USER: ecampus@psgtech.ac.in
-      EMAIL_PASS: fsovftaymjuzdext
+      EMAIL_PASS: zjnnhvohbvgylbnl
 
   frontend:
     image: shyamgk/club-frontend:latest
