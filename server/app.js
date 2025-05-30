@@ -55,6 +55,7 @@ const allowedOrigins = [
   "https://psg-hive.vercel.app",
   "https://psg-hive-shyam-gks-projects.vercel.app",
   "https://psg-hive-git-main-shyam-gks-projects.vercel.app",
+  "http://suclubs.psgtech.ac.in",
 ];
 
 // CORS configuration
