@@ -37,7 +37,7 @@ const authenticate = (req, res, next) => {
     res.clearCookie("jwt", {
       httpOnly: true,
       secure: false,
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      sameSite: "None",
       path: "/",
     });
     return res.status(401).json({
