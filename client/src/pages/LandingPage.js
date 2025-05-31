@@ -13,6 +13,7 @@ export default function LandingPage() {
   const lpClubsRef = useRef(null);
   const lpEventsRef = useRef(null);
   const lpContactRef = useRef(null);
+  const lpObjectivesRef = useRef(null);
   const lpHeroImageRef = useRef(null);
   const [lpIsMenuOpen, setLpIsMenuOpen] = useState(false);
   const [lpShowBackToTop, setLpShowBackToTop] = useState(false);
@@ -74,9 +75,13 @@ export default function LandingPage() {
       { threshold: 0.1 }
     );
 
-    const refs = [lpHeroRef, lpClubsRef, lpEventsRef, lpContactRef];
-    refs.forEach((ref) => {
-      if (ref.current) observer.observe(ref.current);
+    const refs = [lpHeroRef, lpClubsRef, lpEventsRef, lpContactRef, lpObjectivesRef];
+    refs.forEach((ref, index) => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      } else {
+        console.warn(`Ref at index ${index} is null`, ref);
+      }
     });
 
     return () => observer.disconnect();
@@ -164,6 +169,16 @@ export default function LandingPage() {
               }}
             >
               About Hive
+            </a>
+            <a
+              className="lp-nav-link"
+              href="#objectives"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection(lpObjectivesRef);
+              }}
+            >
+              Objectives
             </a>
             <a
               className="lp-nav-link"
@@ -263,7 +278,7 @@ export default function LandingPage() {
       </section>
 
       {/* Objectives of Affiliated Clubs Section */}
-      <section id="objectives" className="objectives-section">
+      <section id="objectives" ref={lpObjectivesRef} className="objectives-section">
         <h2 className="section-heading">Objectives of Affiliated Clubs of Students Union</h2>
         <ul className="objectives-list">
           <li>
