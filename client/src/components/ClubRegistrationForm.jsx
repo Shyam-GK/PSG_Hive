@@ -13,7 +13,7 @@ const ClubRegistrationForm = () => {
   const [clubs, setClubs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [registrationStatus, setRegistrationStatus] = useState(null);
-  const [gender, setGender] = useState(null); // New state for gender
+  const [gender, setGender] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -23,6 +23,14 @@ const ClubRegistrationForm = () => {
       setLoading(true);
       setError(null);
       try {
+        // Fetch student profile to get gender
+        console.log(`Fetching student profile from ${API_BASE_URL}/api/profile/student`);
+        const profileResponse = await axios.get(`${API_BASE_URL}/api/profile/student`, {
+          withCredentials: true,
+        });
+        console.log("Student profile:", profileResponse.data);
+        setGender(profileResponse.data.gender);
+
         // Fetch registration status
         console.log(`Fetching registration status from ${API_BASE_URL}/student/registration-status`);
         const statusResponse = await axios.get(`${API_BASE_URL}/student/registration-status`, {
@@ -44,21 +52,30 @@ const ClubRegistrationForm = () => {
         });
         console.log("Clubs fetched:", clubsResponse.data);
         setClubs(clubsResponse.data);
+
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err.response?.data || err.message);
-        const errorMessage = err.response?.data?.error || 'Failed to load registration data';
-        setError(errorMessage);
-        toast.error(errorMessage, {
-          position: 'bottom-right',
-          autoClose: 3000,
-        });
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          toast.error("Please log in to continue", {
+            position: 'bottom-right',
+            autoClose: 3000,
+          });
+          setTimeout(() => navigate('/login'), 3000);
+        } else {
+          const errorMessage = err.response?.data?.error || 'Failed to load registration data';
+          setError(errorMessage);
+          toast.error(errorMessage, {
+            position: 'bottom-right',
+            autoClose: 3000,
+          });
+        }
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [navigate]); // Add navigate as a dependency
 
   const handleRegister = (clubId, clubName) => {
     if (applications.length >= maxClubsAllowed) {
@@ -176,7 +193,6 @@ const ClubRegistrationForm = () => {
         <h2 className="section-title">Available Clubs</h2>
         <div className="club-cards">
           {clubs.map((club) => {
-            // Check if the club is "Women in Development Cell" and the student is male
             const isWomenInDevCell = club.club_name === "Women in Development Cell";
             const isMale = gender === "Male";
             const isDisabled = applications.find((app) => app.clubId === club.club_id) ||
@@ -206,6 +222,7 @@ const ClubRegistrationForm = () => {
           })}
         </div>
       </section>
+
       {applications.length > 0 && (
         <section className="summary-table-container fade-in">
           <h2 className="section-title">Your Selected Clubs</h2>
