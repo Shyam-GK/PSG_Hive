@@ -189,7 +189,9 @@ const AdminDashboard = () => {
         const missingFields = parsedData.some((row) =>
           requiredFields.some((field) => !row[field] || row[field].trim() === "")
         );
-
+        console.log("Parsed data:", parsedData);
+        console.log("Missing fields check:", missingFields);
+        
         if (missingFields) {
           setUploadError("CSV/Excel file must contain all required fields: user_id, name, email, password, dept, gender, residency_status.");
           return;
