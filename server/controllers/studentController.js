@@ -309,7 +309,7 @@ const getStudentProfile = async (req, res) => {
 
     // Fetch student details
     const userQuery = `
-      SELECT user_id, name, email, dept, class
+      SELECT user_id, name, email, dept, class, gender
       FROM public."Users"
       WHERE user_id ILIKE $1;
     `;

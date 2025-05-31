@@ -13,6 +13,7 @@ const ClubRegistrationForm = () => {
   const [clubs, setClubs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [registrationStatus, setRegistrationStatus] = useState(null);
+  const [gender, setGender] = useState(null); // New state for gender
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -43,6 +44,15 @@ const ClubRegistrationForm = () => {
         });
         console.log("Clubs fetched:", clubsResponse.data);
         setClubs(clubsResponse.data);
+
+        // Fetch student profile to get gender
+        console.log(`Fetching student profile from ${API_BASE_URL}/api/profile/student`);
+        const profileResponse = await axios.get(`${API_BASE_URL}/api/profile/student`, {
+          withCredentials: true,
+        });
+        console.log("Student profile:", profileResponse.data);
+        setGender(profileResponse.data.gender);
+
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err.response?.data || err.message);
@@ -174,27 +184,35 @@ const ClubRegistrationForm = () => {
       <section className="club-list">
         <h2 className="section-title">Available Clubs</h2>
         <div className="club-cards">
-          {clubs.map((club) => (
-            <div className="club-card1 fade-in" key={club.club_id}>
-              <h3 className="club-name">{club.club_name}</h3>
-              <p className="seats-available">Seats Available: {club.seats_left}</p>
-              <button
-                className="register-button"
-                onClick={() => handleRegister(club.club_id, club.club_name)}
-                disabled={
-                  applications.find((app) => app.clubId === club.club_id) ||
-                  club.seats_left === 0 ||
-                  applications.length >= maxClubsAllowed
-                }
-              >
-                {applications.find((app) => app.clubId === club.club_id)
-                  ? 'Selected'
-                  : club.seats_left === 0
-                  ? 'No Seats'
-                  : 'Register'}
-              </button>
-            </div>
-          ))}
+          {clubs.map((club) => {
+            // Check if the club is "Women in Development Cell" and the student is male
+            const isWomenInDevCell = club.club_name === "Women in Development Cell";
+            const isMale = gender === "Male";
+            const isDisabled = applications.find((app) => app.clubId === club.club_id) ||
+                              club.seats_left === 0 ||
+                              applications.length >= maxClubsAllowed ||
+                              (isWomenInDevCell && isMale);
+
+            return (
+              <div className="club-card1 fade-in" key={club.club_id}>
+                <h3 className="club-name">{club.club_name}</h3>
+                <p className="seats-available">Seats Available: {club.seats_left}</p>
+                <button
+                  className="register-button"
+                  onClick={() => handleRegister(club.club_id, club.club_name)}
+                  disabled={isDisabled}
+                >
+                  {applications.find((app) => app.clubId === club.club_id)
+                    ? 'Selected'
+                    : club.seats_left === 0
+                    ? 'No Seats'
+                    : isWomenInDevCell && isMale
+                    ? 'Not Eligible'
+                    : 'Register'}
+                </button>
+              </div>
+            );
+          })}
         </div>
       </section>
 
