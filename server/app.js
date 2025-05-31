@@ -80,7 +80,7 @@ app.use(
 app.use(cookieParser());
 
 // Parse JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // Redis Connection
 require("./config/redis");
