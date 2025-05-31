@@ -117,6 +117,8 @@ const uploadUsers = async (req, res) => {
       return res.status(400).json({ success: false, message: "No user data provided" });
     }
 
+    console.log(`Starting user upload process. Total users to process: ${users.length}`);
+
     const validGenders = ['Male', 'Female'];
     const validResidencyStatuses = ['Hosteller', 'Dayscholar'];
     const saltRounds = 10;
@@ -125,6 +127,20 @@ const uploadUsers = async (req, res) => {
 
     for (const user of users) {
       const { user_id, name, email, password, dept, gender, residency_status, class: userClass, role, year_of_joining } = user;
+
+      // Log 2: For each record, log the user data being processed
+      console.log(`Processing user: ${user_id || "unknown"}`, {
+        user_id,
+        name,
+        email,
+        password,
+        dept,
+        gender,
+        residency_status,
+        class: userClass,
+        role,
+        year_of_joining
+      });
 
       // Validate required fields
       if (!user_id || !name || !email || !password || !dept || !gender || !residency_status) {
