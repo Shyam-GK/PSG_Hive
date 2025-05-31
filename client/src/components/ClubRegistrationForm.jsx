@@ -44,15 +44,6 @@ const ClubRegistrationForm = () => {
         });
         console.log("Clubs fetched:", clubsResponse.data);
         setClubs(clubsResponse.data);
-
-        // Fetch student profile to get gender
-        console.log(`Fetching student profile from ${API_BASE_URL}/api/profile/student`);
-        const profileResponse = await axios.get(`${API_BASE_URL}/api/profile/student`, {
-          withCredentials: true,
-        });
-        console.log("Student profile:", profileResponse.data);
-        setGender(profileResponse.data.gender);
-
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err.response?.data || err.message);
@@ -215,7 +206,6 @@ const ClubRegistrationForm = () => {
           })}
         </div>
       </section>
-
       {applications.length > 0 && (
         <section className="summary-table-container fade-in">
           <h2 className="section-title">Your Selected Clubs</h2>
