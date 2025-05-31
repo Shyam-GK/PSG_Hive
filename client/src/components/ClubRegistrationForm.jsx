@@ -24,8 +24,8 @@ const ClubRegistrationForm = () => {
       setError(null);
       try {
         // Fetch student profile to get gender
-        console.log(`Fetching student profile from ${API_BASE_URL}/api/profile/student`);
-        const profileResponse = await axios.get(`${API_BASE_URL}/api/profile/student`, {
+        console.log(`Fetching student profile from ${API_BASE_URL}/student/me`);
+        const profileResponse = await axios.get(`${API_BASE_URL}/student/me`, {
           withCredentials: true,
         });
         console.log("Student profile:", profileResponse.data);
@@ -62,20 +62,20 @@ const ClubRegistrationForm = () => {
             autoClose: 3000,
           });
           setTimeout(() => navigate('/login'), 3000);
-        } else {
-          const errorMessage = err.response?.data?.error || 'Failed to load registration data';
-          setError(errorMessage);
-          toast.error(errorMessage, {
-            position: 'bottom-right',
-            autoClose: 3000,
-          });
+          return; // Prevent setting loading to false
         }
+        const errorMessage = err.response?.data?.error || 'Failed to load registration data';
+        setError(errorMessage);
+        toast.error(errorMessage, {
+          position: 'bottom-right',
+          autoClose: 3000,
+        });
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [navigate]); // Add navigate as a dependency
+  }, [navigate]);
 
   const handleRegister = (clubId, clubName) => {
     if (applications.length >= maxClubsAllowed) {
@@ -169,7 +169,7 @@ const ClubRegistrationForm = () => {
           <span className="logo-text">HIVE by PSG TECH</span>
         </header>
         <div className="error-message">
-          <p>{error || 'You cannot register at this time.'}</p>
+          <p>{error || 'Registration is closed or you have already registered.'}</p>
           <button className="retry-button" onClick={() => window.location.reload()}>
             Retry
           </button>
