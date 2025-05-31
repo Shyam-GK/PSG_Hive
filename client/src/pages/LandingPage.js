@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import "./LandingPage.css";
 import ClubList from "../components/clublist";
 import EventCard from "../components/events";
@@ -17,10 +17,9 @@ export default function LandingPage() {
   const [lpIsMenuOpen, setLpIsMenuOpen] = useState(false);
   const [lpShowBackToTop, setLpShowBackToTop] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState(null); // State to store user data
-  const [error, setError] = useState(null); // State to store error messages
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Get cookie utility
   const getCookie = (name) => {
     const cookies = document.cookie.split(';');
     for (let cookie of cookies) {
@@ -30,24 +29,22 @@ export default function LandingPage() {
     return null;
   };
 
-  // Fetch user details
   const fetchUserDetails = async () => {
     try {
       console.log(`Fetching user details from ${API_BASE_URL}/student/me...`);
       const response = await axios.get(`${API_BASE_URL}/student/me`, {
-        withCredentials: true, // Include cookies for authentication
+        withCredentials: true,
       });
       console.log("User details fetched successfully:", response.data);
-      setUser(response.data); // Store user data (including user_id)
-      return true; // Indicate success
+      setUser(response.data);
+      return true;
     } catch (err) {
       console.error("Error fetching user details:", err.response?.data || err.message);
       setError(`Failed to load user details: ${err.response?.data?.message || err.message}. Please try logging in again.`);
-      return false; // Indicate failure
+      return false;
     }
   };
 
-  // Fetch user details on component mount
   useEffect(() => {
     const isLoggedIn = getCookie('isLoggedIn');
     if (isLoggedIn === 'true') {
@@ -55,20 +52,15 @@ export default function LandingPage() {
     }
   }, []);
 
-  // Handle profile navigation
   const handleProfileClick = () => {
-    
-      navigate('/student-profile');
-    
+    navigate('/student-profile');
   };
 
-  // Smooth scrolling for navbar links
   const scrollToSection = (ref) => {
     ref.current?.scrollIntoView({ behavior: "smooth" });
     setLpIsMenuOpen(false);
   };
 
-  // Intersection Observer for animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -90,12 +82,10 @@ export default function LandingPage() {
     return () => observer.disconnect();
   }, []);
 
-  // Toggle hamburger menu
   const toggleMenu = () => {
     setLpIsMenuOpen(!lpIsMenuOpen);
   };
 
-  // Show/hide back-to-top button and navbar blur
   useEffect(() => {
     const handleScroll = () => {
       setLpShowBackToTop(window.scrollY > 300);
@@ -105,7 +95,6 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Ripple effect on hero hover
   const createRipple = (event) => {
     const heroImage = lpHeroImageRef.current;
     if (!heroImage) return;
@@ -127,19 +116,17 @@ export default function LandingPage() {
     }, 1000);
   };
 
-  // Navigate to register page
   const handleRegisterClick = () => {
     navigate("/club-registration");
   };
 
-  // Generate initials for avatar
   const getUserInitials = () => {
-    const userName = user?.name || getCookie('userName') || "Guest"; // Use user name from state if available
+    const userName = user?.name || getCookie('userName') || "Guest";
     return userName
       .split(' ')
       .map(word => word.charAt(0).toUpperCase())
       .join('')
-      .slice(0, 2); // Take first two initials
+      .slice(0, 2);
   };
 
   return (
@@ -216,7 +203,7 @@ export default function LandingPage() {
               Register
             </button>
           </div>
-<div
+          <div
             className="lp-profile-photo"
             onClick={handleProfileClick}
             style={{ cursor: 'pointer' }}
@@ -275,6 +262,28 @@ export default function LandingPage() {
         </p>
       </section>
 
+      {/* Objectives of Affiliated Clubs Section */}
+      <section id="objectives" className="objectives-section">
+        <h2 className="section-heading">Objectives of Affiliated Clubs of Students Union</h2>
+        <ul className="objectives-list">
+          <li>
+            To foster leadership skills by encouraging students to take initiative, guide teams, and make responsible decisions in various activities under the guidance of senior faculty members.
+          </li>
+          <li>
+            To improve verbal and non-verbal communication abilities through interactive sessions, public speaking, group discussions, event coordination, and ability to work with other members.
+          </li>
+          <li>
+            To instill discipline, integrity, confidence, and a sense of responsibility, contributing to the overall character development of students.
+          </li>
+          <li>
+            To involve students in community-oriented programmes to develop empathy, civic sense, and a commitment to societal well-being through entrepreneurial attitude and associated skills.
+          </li>
+          <li>
+            To cultivate a spirit of cooperation, coordination, and mutual respect through group tasks and collaborative projects by learning to understand different perspectives of peers and agree to work for a common objective.
+          </li>
+        </ul>
+      </section>
+
       {/* Clubs Section */}
       <section id="clubs" className="clubs-section">
         <ClubList />
@@ -293,8 +302,7 @@ export default function LandingPage() {
             <p>PSG College of Technology</p>
             <p>Post Box No. 1611, Peelamedu</p>
             <p>Coimbatore - 641004, Tamil Nadu, India</p>
-            <p>📞 0422-2572177
-            </p>
+            <p>📞 0422-2572177</p>
             <p>📧 <a href="mailto:contact@psgtech.ac.in">contact@psgtech.ac.in</a></p>
           </div>
           <iframe

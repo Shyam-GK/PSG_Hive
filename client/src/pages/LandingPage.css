@@ -575,3 +575,42 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Objectives Section */
+.objectives-section {
+  padding: 5rem 5%;
+  text-align: center;
+  background-color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.objectives-list {
+  list-style-type: none;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: left;
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.objectives-list li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.objectives-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #60a5fa;
+  font-size: 1.5rem;
+  line-height: 1.8;
+}
+
+/* Add animation for the objectives section */
+.objectives-section {
+  opacity: 0;
+  transform: translateY(30px);
+}
